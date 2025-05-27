@@ -1,173 +1,173 @@
 {
-  "meta": {
-    "generatedAt": "2025-05-27T09:18:49.504Z",
-    "tasksAnalyzed": 20,
-    "totalTasks": 20,
-    "analysisCount": 20,
-    "thresholdScore": 5,
-    "projectName": "Taskmaster",
-    "usedResearch": false
-  },
-  "complexityAnalysis": [
-    {
-      "taskId": 1,
-      "taskTitle": "Project Setup and Supabase Client Integration",
-      "complexityScore": 4,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down 'Project Setup and Supabase Client Integration' into subtasks covering: Android project creation with Kotlin DSL and Jetpack Compose, Git initialization, adding Compose and Supabase dependencies, Supabase client initialization with credentials, setting up a basic MVVM structure, and a simple test to verify Supabase client connectivity.",
-      "reasoning": "Involves multiple distinct setup steps: project config, version control, multiple dependencies, client init, and basic architecture. Each is a manageable sub-unit."
+    "meta": {
+        "generatedAt": "2025-05-27T09:18:49.504Z",
+        "tasksAnalyzed": 20,
+        "totalTasks": 20,
+        "analysisCount": 20,
+        "thresholdScore": 5,
+        "projectName": "Taskmaster",
+        "usedResearch": false
     },
-    {
-      "taskId": 2,
-      "taskTitle": "Supabase Database Schema and Basic RLS Setup",
-      "complexityScore": 6,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down 'Supabase Database Schema and Basic RLS Setup' into subtasks for: creating the `users` table schema, creating the `characters` table schema, enabling RLS for each table, defining specific RLS policies for `users` (own data access), defining RLS policies for `characters` (select all, modify own), and testing these RLS policies.",
-      "reasoning": "Requires SQL for two tables, understanding and implementing RLS policies which can be complex, and thorough testing of permissions."
-    },
-    {
-      "taskId": 3,
-      "taskTitle": "User Authentication (Email/Password)",
-      "complexityScore": 7,
-      "recommendedSubtasks": 9,
-      "expansionPrompt": "Break down 'User Authentication (Email/Password)' into subtasks covering: UI creation for Login and Sign Up screens, ViewModel implementation for auth logic and state, Supabase `signUp` integration, Supabase `signIn` integration, session management, navigation flow post-authentication, and input validation/error display.",
-      "reasoning": "Multi-faceted: involves UI for two screens, ViewModel, multiple API calls, session handling, navigation, and validation logic."
-    },
-    {
-      "taskId": 4,
-      "taskTitle": "Character Creation UI and Logic",
-      "complexityScore": 5,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down 'Character Creation UI and Logic' into subtasks for: UI design for character input, ViewModel for state and validation, logic to check user's character slot availability, logic to save character data to Supabase, and handling the 100-character limit.",
-      "reasoning": "Combines UI, ViewModel, business logic (slot check involving a read), data validation, and a Supabase write operation."
-    },
-    {
-      "taskId": 5,
-      "taskTitle": "Character List Display",
-      "complexityScore": 4,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down 'Character List Display' into subtasks for: UI design for the list and list items, ViewModel for data fetching and state, Supabase query to get user's characters, and handling loading/empty states in the UI.",
-      "reasoning": "Standard list display pattern but includes data fetching from Supabase, UI state management (loading, empty), and item rendering."
-    },
-    {
-      "taskId": 6,
-      "taskTitle": "Battle Opponent Selection Logic",
-      "complexityScore": 4,
-      "recommendedSubtasks": 5,
-      "expansionPrompt": "Break down 'Battle Opponent Selection Logic' into subtasks covering: fetching potential opponent characters from Supabase (excluding the player's own character), implementing random selection from the list, and unit testing the selection logic. Consider a subtask for an MVP dummy opponent selection if applicable.",
-      "reasoning": "Involves a Supabase query with specific filtering, random selection algorithm, and potentially an alternative MVP path."
-    },
-    {
-      "taskId": 7,
-      "taskTitle": "Gemini API Integration (Text-Only Battle Logic)",
-      "complexityScore": 7,
-      "recommendedSubtasks": 8,
-      "expansionPrompt": "Break down 'Gemini API Integration (Text-Only Battle Logic)' into subtasks for: adding Google AI SDK, secure API key setup, Gemini model initialization, prompt construction, making the API call, parsing the battle narrative and winner from the response, and initial error handling.",
-      "reasoning": "Integrating a new external AI SDK, managing API keys securely, prompt engineering, API communication, and response parsing are all non-trivial."
-    },
-    {
-      "taskId": 8,
-      "taskTitle": "Battle Result Display (Text-Only)",
-      "complexityScore": 3,
-      "recommendedSubtasks": 5,
-      "expansionPrompt": "Break down 'Battle Result Display (Text-Only)' into subtasks for: designing the UI to show battle narrative and outcome, implementing the narrative display (scrollable), implementing the winner/loser indication, and creating a ViewModel to manage this data.",
-      "reasoning": "Primarily UI work for displaying text and a clear outcome, managed by a ViewModel. Relatively straightforward."
-    },
-    {
-      "taskId": 9,
-      "taskTitle": "Update Character Battle Stats",
-      "complexityScore": 4,
-      "recommendedSubtasks": 6,
-      "expansionPrompt": "Break down 'Update Character Battle Stats' into subtasks for: identifying winner/loser character IDs, implementing the Supabase update logic for winner's wins, implementing the Supabase update logic for loser's losses, and testing these updates. Consider a subtask for exploring RPC functions for atomic updates.",
-      "reasoning": "Involves conditional logic and multiple database write operations. Atomicity (RPC) is an advanced consideration."
-    },
-    {
-      "taskId": 10,
-      "taskTitle": "Basic Battle Cooldown Logic",
-      "complexityScore": 5,
-      "recommendedSubtasks": 6,
-      "expansionPrompt": "Break down 'Basic Battle Cooldown Logic' into subtasks for: fetching the `last_battle_timestamp` from Supabase, implementing the cooldown check, providing UI feedback for active cooldown, updating the timestamp post-battle, and testing the entire cooldown flow.",
-      "reasoning": "Requires timestamp manipulation, Supabase read/write operations, and UI changes based on cooldown state."
-    },
-    {
-      "taskId": 11,
-      "taskTitle": "Gemini API Integration (Image Generation)",
-      "complexityScore": 7,
-      "recommendedSubtasks": 8,
-      "expansionPrompt": "Break down 'Gemini API Integration (Image Generation)' into subtasks for: selecting the Gemini image generation model, setting up API access, constructing image prompts from battle narratives, making the API call, handling the image response (URL/data), and initial error handling.",
-      "reasoning": "Similar to text AI integration but for images; involves model selection, specific prompting for visuals, and handling image data/URLs."
-    },
-    {
-      "taskId": 12,
-      "taskTitle": "Battle Result Image Display & Optional Caching",
-      "complexityScore": 5,
-      "recommendedSubtasks": 8,
-      "expansionPrompt": "Break down 'Battle Result Image Display & Optional Caching' into subtasks for: integrating an image loading library, updating the UI to display an image, loading the image from Gemini's output, and handling loading states. Include optional subtasks for setting up Supabase Storage for images and implementing image upload/retrieval via Storage.",
-      "reasoning": "Requires an image loading library and UI work. Optional Supabase Storage integration adds significant steps for image persistence and management."
-    },
-    {
-      "taskId": 13,
-      "taskTitle": "Basic Leaderboard Implementation",
-      "complexityScore": 4,
-      "recommendedSubtasks": 6,
-      "expansionPrompt": "Break down 'Basic Leaderboard Implementation' into subtasks for: designing the leaderboard UI, creating a ViewModel, implementing the Supabase query for ranked character data, displaying leaderboard entries, and adding necessary database indexes for performance.",
-      "reasoning": "Standard list display with sorted/limited data from backend; database indexing is an important performance aspect."
-    },
-    {
-      "taskId": 14,
-      "taskTitle": "Google Play Billing Setup & Product Definition",
-      "complexityScore": 6,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down 'Google Play Billing Setup & Product Definition' into subtasks for: adding the Billing library, initializing and connecting the BillingClient, defining IAP products in Google Play Console, implementing logic to query product details, and setting up testing infrastructure.",
-      "reasoning": "Involves integrating an external billing library, configuring products in an external console, and setting up client-side communication."
-    },
-    {
-      "taskId": 15,
-      "taskTitle": "In-App Purchase - Character Slots",
-      "complexityScore": 7,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down 'In-App Purchase - Character Slots' into subtasks for: UI for initiating purchase, launching the billing flow, handling purchase updates and acknowledgment, updating user's character slots in Supabase, and testing the full flow. Consider a subtask for server-side purchase validation.",
-      "reasoning": "Complex flow: UI, Play Billing interaction, purchase lifecycle handling (acknowledgment), backend update, and crucial security/validation aspects."
-    },
-    {
-      "taskId": 16,
-      "taskTitle": "In-App Purchase - Tokens & Cooldown Skip",
-      "complexityScore": 8,
-      "recommendedSubtasks": 11,
-      "expansionPrompt": "Break down 'In-App Purchase - Tokens & Cooldown Skip' into subtasks for: UI and logic for purchasing tokens (including consumption), updating user's token balance in Supabase, UI and logic for using tokens to skip battle cooldowns, decrementing tokens on use, and testing both purchase and usage flows.",
-      "reasoning": "Combines IAP for consumable tokens (purchase, consumption, backend update) with game logic for spending tokens, interacting with another feature (cooldown)."
-    },
-    {
-      "taskId": 17,
-      "taskTitle": "UI/UX Polish - Main Screens",
-      "complexityScore": 5,
-      "recommendedSubtasks": 8,
-      "expansionPrompt": "Break down 'UI/UX Polish - Main Screens' into subtasks focusing on: refining layouts and typography for specific screens (Login, Main Menu, Character, Battle Results), implementing screen transitions, adding subtle UI animations, ensuring consistent loading indicators, and cross-device testing.",
-      "reasoning": "Iterative and somewhat subjective work, but crucial for user experience. Can be broken down by screen or type of polish."
-    },
-    {
-      "taskId": 18,
-      "taskTitle": "Battle History Implementation (Store & View)",
-      "complexityScore": 6,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down 'Battle History Implementation (Store & View)' into subtasks for: creating the `battles` table schema in Supabase, implementing logic to save battle records, designing and implementing the UI to display battle history, fetching history data for the user, and testing.",
-      "reasoning": "Involves new database schema, data persistence logic after battles, and a new UI screen with data fetching and display."
-    },
-    {
-      "taskId": 19,
-      "taskTitle": "Comprehensive Error Handling & Loading States",
-      "complexityScore": 6,
-      "recommendedSubtasks": 9,
-      "expansionPrompt": "Break down 'Comprehensive Error Handling & Loading States' into subtasks for: systematically reviewing and implementing error handling for Supabase calls (Auth, Postgrest, Storage), Gemini API calls (text, image), and Google Play Billing. Include subtasks for designing consistent UI for errors and loading states, and testing these scenarios.",
-      "reasoning": "Pervasive task requiring systematic review across all external interactions and UI components to ensure robustness and good user feedback."
-    },
-    {
-      "taskId": 20,
-      "taskTitle": "Advanced Prompt Engineering for Gemini",
-      "complexityScore": 5,
-      "recommendedSubtasks": 7,
-      "expansionPrompt": "Break down 'Advanced Prompt Engineering for Gemini' into subtasks for: researching prompt engineering techniques, experimenting with various prompt structures for battle narratives and winner declaration (e.g., in AI Studio), evaluating prompt effectiveness, documenting successful prompts, and integrating them into the app.",
-      "reasoning": "Iterative and research-heavy, focusing on optimizing AI output quality rather than complex coding. Involves experimentation and qualitative analysis."
-    }
-  ]
+    "complexityAnalysis": [
+        {
+            "taskId": 1,
+            "taskTitle": "Project Setup and Supabase Client Integration",
+            "complexityScore": 4,
+            "recommendedSubtasks": 7,
+            "expansionPrompt": "Break down 'Project Setup and Supabase Client Integration' into subtasks covering: Android project creation with Kotlin DSL and Jetpack Compose, Git initialization, adding Compose and Supabase dependencies, Supabase client initialization with credentials, setting up a basic MVVM structure, and a simple test to verify Supabase client connectivity.",
+            "reasoning": "Involves multiple distinct setup steps: project config, version control, multiple dependencies, client init, and basic architecture. Each is a manageable sub-unit."
+        },
+        {
+            "taskId": 2,
+            "taskTitle": "Supabase Database Schema and Basic RLS Setup",
+            "complexityScore": 6,
+            "recommendedSubtasks": 7,
+            "expansionPrompt": "Break down 'Supabase Database Schema and Basic RLS Setup' into subtasks for: creating the `users` table schema, creating the `characters` table schema, enabling RLS for each table, defining specific RLS policies for `users` (own data access), defining RLS policies for `characters` (select all, modify own), and testing these RLS policies.",
+            "reasoning": "Requires SQL for two tables, understanding and implementing RLS policies which can be complex, and thorough testing of permissions."
+        },
+        {
+            "taskId": 3,
+            "taskTitle": "User Authentication (Email/Password)",
+            "complexityScore": 7,
+            "recommendedSubtasks": 9,
+            "expansionPrompt": "Break down 'User Authentication (Email/Password)' into subtasks covering: UI creation for Login and Sign Up screens, ViewModel implementation for auth logic and state, Supabase `signUp` integration, Supabase `signIn` integration, session management, navigation flow post-authentication, and input validation/error display.",
+            "reasoning": "Multi-faceted: involves UI for two screens, ViewModel, multiple API calls, session handling, navigation, and validation logic."
+        },
+        {
+            "taskId": 4,
+            "taskTitle": "Character Creation UI and Logic",
+            "complexityScore": 5,
+            "recommendedSubtasks": 7,
+            "expansionPrompt": "Break down 'Character Creation UI and Logic' into subtasks for: UI design for character input, ViewModel for state and validation, logic to check user's character slot availability, logic to save character data to Supabase, and handling the 100-character limit.",
+            "reasoning": "Combines UI, ViewModel, business logic (slot check involving a read), data validation, and a Supabase write operation."
+        },
+        {
+            "taskId": 5,
+            "taskTitle": "Character List Display",
+            "complexityScore": 4,
+            "recommendedSubtasks": 7,
+            "expansionPrompt": "Break down 'Character List Display' into subtasks for: UI design for the list and list items, ViewModel for data fetching and state, Supabase query to get user's characters, and handling loading/empty states in the UI.",
+            "reasoning": "Standard list display pattern but includes data fetching from Supabase, UI state management (loading, empty), and item rendering."
+        },
+        {
+            "taskId": 6,
+            "taskTitle": "Battle Opponent Selection Logic",
+            "complexityScore": 4,
+            "recommendedSubtasks": 5,
+            "expansionPrompt": "Break down 'Battle Opponent Selection Logic' into subtasks covering: fetching potential opponent characters from Supabase (excluding the player's own character), implementing random selection from the list, and unit testing the selection logic. Consider a subtask for an MVP dummy opponent selection if applicable.",
+            "reasoning": "Involves a Supabase query with specific filtering, random selection algorithm, and potentially an alternative MVP path."
+        },
+        {
+            "taskId": 7,
+            "taskTitle": "Gemini API Integration (Text-Only Battle Logic)",
+            "complexityScore": 7,
+            "recommendedSubtasks": 8,
+            "expansionPrompt": "Break down 'Gemini API Integration (Text-Only Battle Logic)' into subtasks for: adding Google AI SDK, secure API key setup, Gemini model initialization, prompt construction, making the API call, parsing the battle narrative and winner from the response, and initial error handling.",
+            "reasoning": "Integrating a new external AI SDK, managing API keys securely, prompt engineering, API communication, and response parsing are all non-trivial."
+        },
+        {
+            "taskId": 8,
+            "taskTitle": "Battle Result Display (Text-Only)",
+            "complexityScore": 3,
+            "recommendedSubtasks": 5,
+            "expansionPrompt": "Break down 'Battle Result Display (Text-Only)' into subtasks for: designing the UI to show battle narrative and outcome, implementing the narrative display (scrollable), implementing the winner/loser indication, and creating a ViewModel to manage this data.",
+            "reasoning": "Primarily UI work for displaying text and a clear outcome, managed by a ViewModel. Relatively straightforward."
+        },
+        {
+            "taskId": 9,
+            "taskTitle": "Update Character Battle Stats",
+            "complexityScore": 4,
+            "recommendedSubtasks": 6,
+            "expansionPrompt": "Break down 'Update Character Battle Stats' into subtasks for: identifying winner/loser character IDs, implementing the Supabase update logic for winner's wins, implementing the Supabase update logic for loser's losses, and testing these updates. Consider a subtask for exploring RPC functions for atomic updates.",
+            "reasoning": "Involves conditional logic and multiple database write operations. Atomicity (RPC) is an advanced consideration."
+        },
+        {
+            "taskId": 10,
+            "taskTitle": "Basic Battle Cooldown Logic",
+            "complexityScore": 5,
+            "recommendedSubtasks": 6,
+            "expansionPrompt": "Break down 'Basic Battle Cooldown Logic' into subtasks for: fetching the `last_battle_timestamp` from Supabase, implementing the cooldown check, providing UI feedback for active cooldown, updating the timestamp post-battle, and testing the entire cooldown flow.",
+            "reasoning": "Requires timestamp manipulation, Supabase read/write operations, and UI changes based on cooldown state."
+        },
+        {
+            "taskId": 11,
+            "taskTitle": "Gemini API Integration (Image Generation)",
+            "complexityScore": 7,
+            "recommendedSubtasks": 8,
+            "expansionPrompt": "Break down 'Gemini API Integration (Image Generation)' into subtasks for: selecting the Gemini image generation model, setting up API access, constructing image prompts from battle narratives, making the API call, handling the image response (URL/data), and initial error handling.",
+            "reasoning": "Similar to text AI integration but for images; involves model selection, specific prompting for visuals, and handling image data/URLs."
+        },
+        {
+            "taskId": 12,
+            "taskTitle": "Battle Result Image Display & Optional Caching",
+            "complexityScore": 5,
+            "recommendedSubtasks": 8,
+            "expansionPrompt": "Break down 'Battle Result Image Display & Optional Caching' into subtasks for: integrating an image loading library, updating the UI to display an image, loading the image from Gemini's output, and handling loading states. Include optional subtasks for setting up Supabase Storage for images and implementing image upload/retrieval via Storage.",
+            "reasoning": "Requires an image loading library and UI work. Optional Supabase Storage integration adds significant steps for image persistence and management."
+        },
+        {
+            "taskId": 13,
+            "taskTitle": "Basic Leaderboard Implementation",
+            "complexityScore": 4,
+            "recommendedSubtasks": 6,
+            "expansionPrompt": "Break down 'Basic Leaderboard Implementation' into subtasks for: designing the leaderboard UI, creating a ViewModel, implementing the Supabase query for ranked character data, displaying leaderboard entries, and adding necessary database indexes for performance.",
+            "reasoning": "Standard list display with sorted/limited data from backend; database indexing is an important performance aspect."
+        },
+        {
+            "taskId": 14,
+            "taskTitle": "Google Play Billing Setup & Product Definition",
+            "complexityScore": 6,
+            "recommendedSubtasks": 7,
+            "expansionPrompt": "Break down 'Google Play Billing Setup & Product Definition' into subtasks for: adding the Billing library, initializing and connecting the BillingClient, defining IAP products in Google Play Console, implementing logic to query product details, and setting up testing infrastructure.",
+            "reasoning": "Involves integrating an external billing library, configuring products in an external console, and setting up client-side communication."
+        },
+        {
+            "taskId": 15,
+            "taskTitle": "In-App Purchase - Character Slots",
+            "complexityScore": 7,
+            "recommendedSubtasks": 7,
+            "expansionPrompt": "Break down 'In-App Purchase - Character Slots' into subtasks for: UI for initiating purchase, launching the billing flow, handling purchase updates and acknowledgment, updating user's character slots in Supabase, and testing the full flow. Consider a subtask for server-side purchase validation.",
+            "reasoning": "Complex flow: UI, Play Billing interaction, purchase lifecycle handling (acknowledgment), backend update, and crucial security/validation aspects."
+        },
+        {
+            "taskId": 16,
+            "taskTitle": "In-App Purchase - Tokens & Cooldown Skip",
+            "complexityScore": 8,
+            "recommendedSubtasks": 11,
+            "expansionPrompt": "Break down 'In-App Purchase - Tokens & Cooldown Skip' into subtasks for: UI and logic for purchasing tokens (including consumption), updating user's token balance in Supabase, UI and logic for using tokens to skip battle cooldowns, decrementing tokens on use, and testing both purchase and usage flows.",
+            "reasoning": "Combines IAP for consumable tokens (purchase, consumption, backend update) with game logic for spending tokens, interacting with another feature (cooldown)."
+        },
+        {
+            "taskId": 17,
+            "taskTitle": "UI/UX Polish - Main Screens",
+            "complexityScore": 5,
+            "recommendedSubtasks": 8,
+            "expansionPrompt": "Break down 'UI/UX Polish - Main Screens' into subtasks focusing on: refining layouts and typography for specific screens (Login, Main Menu, Character, Battle Results), implementing screen transitions, adding subtle UI animations, ensuring consistent loading indicators, and cross-device testing.",
+            "reasoning": "Iterative and somewhat subjective work, but crucial for user experience. Can be broken down by screen or type of polish."
+        },
+        {
+            "taskId": 18,
+            "taskTitle": "Battle History Implementation (Store & View)",
+            "complexityScore": 6,
+            "recommendedSubtasks": 7,
+            "expansionPrompt": "Break down 'Battle History Implementation (Store & View)' into subtasks for: creating the `battles` table schema in Supabase, implementing logic to save battle records, designing and implementing the UI to display battle history, fetching history data for the user, and testing.",
+            "reasoning": "Involves new database schema, data persistence logic after battles, and a new UI screen with data fetching and display."
+        },
+        {
+            "taskId": 19,
+            "taskTitle": "Comprehensive Error Handling & Loading States",
+            "complexityScore": 6,
+            "recommendedSubtasks": 9,
+            "expansionPrompt": "Break down 'Comprehensive Error Handling & Loading States' into subtasks for: systematically reviewing and implementing error handling for Supabase calls (Auth, Postgrest, Storage), Gemini API calls (text, image), and Google Play Billing. Include subtasks for designing consistent UI for errors and loading states, and testing these scenarios.",
+            "reasoning": "Pervasive task requiring systematic review across all external interactions and UI components to ensure robustness and good user feedback."
+        },
+        {
+            "taskId": 20,
+            "taskTitle": "Advanced Prompt Engineering for Gemini",
+            "complexityScore": 5,
+            "recommendedSubtasks": 7,
+            "expansionPrompt": "Break down 'Advanced Prompt Engineering for Gemini' into subtasks for: researching prompt engineering techniques, experimenting with various prompt structures for battle narratives and winner declaration (e.g., in AI Studio), evaluating prompt effectiveness, documenting successful prompts, and integrating them into the app.",
+            "reasoning": "Iterative and research-heavy, focusing on optimizing AI output quality rather than complex coding. Involves experimentation and qualitative analysis."
+        }
+    ]
 }
