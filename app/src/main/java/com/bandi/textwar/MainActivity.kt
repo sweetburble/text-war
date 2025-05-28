@@ -1,70 +1,50 @@
 package com.bandi.textwar
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.bandi.textwar.data.remote.SupabaseInstance
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.bandi.textwar.presentation.viewmodels.AuthViewModel
+import com.bandi.textwar.presentation.viewmodels.LoginState
+import com.bandi.textwar.ui.navigation.AuthNavigation
+import com.bandi.textwar.ui.screens.LoadingScreen
+import com.bandi.textwar.ui.screens.MainAppScreen
 import com.bandi.textwar.ui.theme.TextWarTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val authViewModel: AuthViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
-        // Supabase 클라이언트 초기화 확인 로그
-        try {
-            val client = SupabaseInstance.client
-            Log.d("SupabaseInit", "Supabase client initialized successfully: $client")
-            // 간단한 테스트 호출 (선택 사항, Supabase 프로젝트 설정에 따라 실패할 수 있음)
-            // lifecycleScope.launch {
-            //     try {
-            //         // 예시: 가장 기본적인 users 테이블의 존재 여부 확인 (인증 불필요, 테이블 접근 권한 필요)
-            //         // 실제로는 더 의미 있는 테스트 호출을 해야 합니다.
-            //         // 이 호출은 RLS 정책 등에 따라 실패할 수 있으므로 주의해야 합니다.
-            //         // val result = client.postgrest.from("users").select().count(Count.EXACT)
-            //         // Log.d("SupabaseInit", "Supabase test call successful: ${result.count}")
-            //     } catch (e: Exception) {
-            //         Log.e("SupabaseInit", "Supabase test call failed", e)
-            //     }
-            // }
-        } catch (e: Exception) {
-            Log.e("SupabaseInit", "Supabase client initialization failed", e)
-        }
-
         setContent {
             TextWarTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val loginState by authViewModel.loginState.collectAsState()
+
+                when (loginState) {
+                    LoginState.Unknown -> {
+                        LoadingScreen()
+                    }
+                    LoginState.LoggedIn -> {
+                        MainAppScreen(
+                            onLogoutClick = { authViewModel.logoutUser() }
+                        )
+                    }
+                    LoginState.LoggedOut -> {
+                        AuthNavigation(
+                            onLoginSuccess = {
+                                // 이 콜백은 AuthNavigation -> LoginScreen을 통해 호출됨
+                                // loginState가 AuthViewModel 내부에서 LoginState.LoggedIn으로 변경될 것이므로
+                                // 이 when 문이 recomposition되어 MainAppScreen으로 자동 전환됨
+                                // 특별한 액션이 필요하다면 여기에 추가
+                            }
+                        )
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TextWarTheme {
-        Greeting("Android")
     }
 }

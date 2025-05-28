@@ -13,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TextWar"
+        android:name=".MainApplication"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -23,6 +24,16 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- 딥링크 처리를 위한 인텐트 필터 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Supabase 대시보드 Site URL에 설정한 스킴과 호스트 -->
+                <data android:scheme="textwar" android:host="auth" android:pathPrefix="/callback" />
+                <!-- 만약 경로까지 지정했다면 android:pathPrefix="/callback" 등도 추가 -->
             </intent-filter>
         </activity>
     </application>
