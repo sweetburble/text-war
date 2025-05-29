@@ -15,4 +15,5 @@ abstract class DataModule {
     @Binds
     @Singleton // Repository는 보통 Singleton으로 관리
     abstract fun bindCharacterRepository(characterRepositoryImpl: CharacterRepositoryImpl): CharacterRepository
+
 } 

@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.Flow
 interface CharacterRepository {
 
     /**
-     * 현재 로그인한 사용자의 모든 캐릭터 목록을 가져옵니다.
+     * 현재 로그인한 사용자의 모든 캐릭터 목록을 가져온다.
      * Supabase RLS 정책에 따라 현재 사용자의 데이터만 반환될 것으로 예상합니다.
      */
     suspend fun getCurrentUserCharacters(): Flow<List<CharacterSummary>>
 
     /**
-     * 특정 ID의 캐릭터 상세 정보를 가져옵니다.
+     * 특정 ID의 캐릭터 상세 정보를 가져온다.
      * @param characterId 가져올 캐릭터의 ID
      */
     suspend fun getCharacterDetail(characterId: String): Flow<CharacterDetail>
@@ -32,13 +32,13 @@ interface CharacterRepository {
     suspend fun createCharacter(characterName: String, description: String): Flow<CharacterInsert>
 
     /**
-     * 현재 로그인한 사용자의 프로필 정보를 가져옵니다.
+     * 현재 로그인한 사용자의 프로필 정보를 가져온다.
      * @return UserProfile 또는 null
      */
     suspend fun getCurrentUserProfile(): Flow<UserProfile?>
 
     /**
-     * 현재 로그인한 사용자의 캐릭터 생성 개수를 가져옵니다.
+     * 현재 로그인한 사용자의 캐릭터 생성 개수를 가져온다.
      * @return 캐릭터 수
      */
     suspend fun getCurrentUserCharacterCount(): Flow<Int>

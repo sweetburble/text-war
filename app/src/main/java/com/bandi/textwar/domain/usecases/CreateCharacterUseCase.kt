@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
- * 새로운 캐릭터를 생성하는 유즈케이스입니다.
+ * 새로운 캐릭터를 생성하는 유즈케이스
  */
 class CreateCharacterUseCase @Inject constructor(
     private val characterRepository: CharacterRepository

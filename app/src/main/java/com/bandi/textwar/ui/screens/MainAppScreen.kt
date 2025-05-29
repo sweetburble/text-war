@@ -37,8 +37,7 @@ fun MainAppScreen(onLogoutClick: () -> Unit) {
         composable(
             route = "character_detail/{characterId}",
             arguments = listOf(navArgument("characterId") { type = NavType.StringType })
-        ) {
-            backStackEntry ->
+        ) { backStackEntry ->
             CharacterDetailScreen(navController = navController)
         }
     }

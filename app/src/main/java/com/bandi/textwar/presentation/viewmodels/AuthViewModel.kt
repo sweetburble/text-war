@@ -141,11 +141,7 @@ class AuthViewModel @Inject constructor(
             } catch (e: Exception) {
                 val errorMessage = when (e.message) {
                     null, "" -> "회원가입 중 알 수 없는 에러가 발생했습니다."
-                    // Supabase는 이메일 형식 오류 시 "To signup, please provide a valid email address"
-                    // 또는 "Unable to validate email address: invalid format" 와 유사한 메시지를 반환할 수 있습니다.
-                    // 실제 반환되는 메시지를 확인하고 케이스를 추가하는 것이 좋습니다.
                     "User already registered" -> "이미 가입된 이메일입니다."
-                    // 예: e.message?.contains("valid email address", ignoreCase = true) == true -> "올바른 이메일 형식이 아닙니다."
                     else -> e.message // 기본적으로 Supabase 메시지 사용
                 }
                 _authUiState.value = AuthUiState.Error(errorMessage!!)

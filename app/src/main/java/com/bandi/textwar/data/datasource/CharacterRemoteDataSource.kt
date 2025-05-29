@@ -13,7 +13,7 @@ import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
 
 /**
- * Supabase를 사용하여 캐릭터 데이터를 가져오는 Remote DataSource
+ * Supabase를 사용하여, 캐릭터 데이터를 가져오는 Remote DataSource
  */
 class CharacterRemoteDataSource @Inject constructor(
     private val supabaseClient: SupabaseClient,
@@ -39,7 +39,7 @@ class CharacterRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 특정 ID의 캐릭터 상세 정보를 Supabase에서 가져옵니다.
+     * 특정 ID의 캐릭터 상세 정보를 Supabase에서 가져온다.
      * @param characterId 가져올 캐릭터의 ID
      * @return 요청한 ID의 CharacterDetail. 해당 ID의 캐릭터가 없거나 접근 권한이 없으면 오류 발생 가능.
      */
@@ -55,7 +55,7 @@ class CharacterRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 새로운 캐릭터를 Supabase에 생성합니다.
+     * 새로운 캐릭터를 Supabase에 생성
      * @param characterData 생성할 캐릭터의 데이터 (user_id, character_name, description 포함)
      * @return 생성된 캐릭터 데이터 (Supabase에서 반환된 값 기준)
      */
@@ -68,7 +68,7 @@ class CharacterRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 특정 사용자의 프로필 정보를 가져옵니다.
+     * 특정 사용자의 프로필 정보를 가져온다.
      * @param userId 가져올 사용자의 ID
      * @return UserProfile 또는 null (사용자가 없거나 RLS로 접근 불가 시)
      */
@@ -81,7 +81,7 @@ class CharacterRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 특정 사용자가 생성한 캐릭터의 수를 가져옵니다.
+     * 특정 사용자가 생성한 캐릭터의 수를 가져온다.
      * @param userId 사용자 ID
      * @return 해당 사용자의 캐릭터 수
      */

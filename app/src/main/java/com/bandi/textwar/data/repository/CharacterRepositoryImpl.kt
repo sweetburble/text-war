@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
- * CharacterRepository의 구현체입니다.
- * CharacterRemoteDataSource를 통해 데이터를 가져옵니다.
+ * CharacterRepository의 구현체
+ * CharacterRemoteDataSource를 통해 데이터를 가져온다.
  */
 class CharacterRepositoryImpl @Inject constructor(
     private val remoteDataSource: CharacterRemoteDataSource,

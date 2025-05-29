@@ -21,7 +21,7 @@ data class CharacterSummary(
 )
 
 /**
- * 캐릭터의 모든 상세 정보를 담는 데이터 모델입니다.
+ * 캐릭터의 모든 상세 정보를 담는 데이터 모델
  *
  * @property id 캐릭터 고유 ID
  * @property userId 사용자 ID

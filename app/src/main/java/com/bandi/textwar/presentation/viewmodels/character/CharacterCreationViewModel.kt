@@ -2,10 +2,8 @@ package com.bandi.textwar.presentation.viewmodels.character
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bandi.textwar.data.models.CharacterInsert
 import com.bandi.textwar.domain.usecases.CheckCharacterSlotAvailabilityUseCase
 import com.bandi.textwar.domain.usecases.CreateCharacterUseCase
-import com.bandi.textwar.domain.usecases.SlotAvailabilityResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,18 +19,18 @@ import javax.inject.Inject
 
 const val MAX_CHAR_DESCRIPTION_LENGTH_VM = 100
 
-sealed class SlotCheckState {
-    object Idle : SlotCheckState()
-    object Loading : SlotCheckState()
-    data class Success(val canCreateCharacter: Boolean, val message: String? = null) : SlotCheckState()
-    data class Error(val message: String) : SlotCheckState()
+sealed interface SlotCheckState {
+    object Idle : SlotCheckState
+    object Loading : SlotCheckState
+    data class Success(val canCreateCharacter: Boolean, val message: String? = null) : SlotCheckState
+    data class Error(val message: String) : SlotCheckState
 }
 
-sealed class SaveCharacterState {
-    object Idle : SaveCharacterState()
-    object Loading : SaveCharacterState()
-    data class Success(val message: String) : SaveCharacterState()
-    data class Error(val message: String) : SaveCharacterState()
+sealed interface SaveCharacterState {
+    object Idle : SaveCharacterState
+    object Loading : SaveCharacterState
+    data class Success(val message: String) : SaveCharacterState
+    data class Error(val message: String) : SaveCharacterState
 }
 
 @HiltViewModel
@@ -128,7 +126,7 @@ class CharacterCreationViewModel @Inject constructor(
         } else {
             val errorMsg = when (currentSlotCheck) {
                 is SlotCheckState.Error -> currentSlotCheck.message
-                is SlotCheckState.Success -> if (!currentSlotCheck.canCreateCharacter) "캐릭터 슬롯이 부족합니다." else "알 수 없는 슬롯 상태입니다."
+                is SlotCheckState.Success -> "캐릭터 슬롯이 부족합니다."
                 else -> "캐릭터를 저장할 수 없습니다. 슬롯 확인을 진행해주세요."
             }
             _saveCharacterState.value = SaveCharacterState.Error(errorMsg)

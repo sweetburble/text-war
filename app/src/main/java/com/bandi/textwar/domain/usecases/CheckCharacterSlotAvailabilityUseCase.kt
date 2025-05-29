@@ -13,7 +13,7 @@ data class SlotAvailabilityResult(
 )
 
 /**
- * 현재 사용자의 캐릭터 생성 슬롯 가용성을 확인하는 유즈케이스입니다.
+ * 현재 사용자의 캐릭터 생성 슬롯 가용성을 확인하는 유즈케이스
  */
 class CheckCharacterSlotAvailabilityUseCase @Inject constructor(
     private val characterRepository: CharacterRepository

@@ -1,6 +1,5 @@
 package com.bandi.textwar.ui.screens.auth
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bandi.textwar.presentation.viewmodels.AuthViewModel
 import com.bandi.textwar.presentation.viewmodels.AuthUiState
+import timber.log.Timber
 
 // LoginScreen을 위한 Preview 위젯
 @Preview(showBackground = true)
@@ -94,7 +94,7 @@ fun LoginScreen(
         // 에러 메시지 및 로딩 상태 처리 (authUiState 기반)
         when (authUiState) {
             is AuthUiState.Error -> {
-                Log.e("Login error", (authUiState as AuthUiState.Error).message)
+                Timber.e((authUiState as AuthUiState.Error).message)
                 Text(
                     text = (authUiState as AuthUiState.Error).message,
                     color = MaterialTheme.colorScheme.error,
