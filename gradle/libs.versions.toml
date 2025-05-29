@@ -53,15 +53,15 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-supabase = { group = "io.github.jan-tennert.supabse", name = "supabase-kt", version.ref = "supabase" }
-supabase-auth = { group = "io.github.jan-tennert.supabse", name = "auth-kt", version.ref = "supabase" }
-supabase-postgrest = { group = "io.github.jan-tennert.supabse", name = "postgrest-kt", version.ref = "supabase" }
-supabase-storage = { group = "io.github.jan-tennert.supabse", name = "storage-kt", version.ref = "supabase" }
+supabase = { group = "io.github.jan-tennert.supabase", name = "supabase-kt", version.ref = "supabase" }
+supabase-auth = { group = "io.github.jan-tennert.supabase", name = "auth-kt", version.ref = "supabase" }
+supabase-postgrest = { group = "io.github.jan-tennert.supabase", name = "postgrest-kt", version.ref = "supabase" }
+supabase-storage = { group = "io.github.jan-tennert.supabase", name = "storage-kt", version.ref = "supabase" }
 coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 ktor-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
 ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
-ktor-utils = { group = "io.ktor", name = "ktor-client-utils", version.ref = "ktor" }
+ktor-utils = { group = "io.ktor", name = "ktor-utils", version.ref = "ktor" }
 
 
 

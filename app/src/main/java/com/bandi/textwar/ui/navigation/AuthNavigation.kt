@@ -27,7 +27,7 @@ fun AuthNavigation() {
         composable(AuthDestinations.SIGN_UP_ROUTE) {
             // SignUpScreen으로 ViewModel을 넘길 필요 없이 SignUpScreen 내부에서 viewModel() 호출
             SignUpScreen(
-                onNavigateToLogin = { navController.navigate(AuthDestinations.LOGIN_ROUTE) {popUpTo(AuthDestinations.LOGIN_ROUTE) { inclusive = true } } },
+                onNavigateToLogin = { navController.navigate(AuthDestinations.LOGIN_ROUTE) { popUpTo(AuthDestinations.LOGIN_ROUTE) { inclusive = true } } },
                 onSignUpSuccess = {
                     // 회원가입 성공 후 로그인 화면으로 이동하고, 백스택에서 회원가입 화면 제거
                     navController.navigate(AuthDestinations.LOGIN_ROUTE) {
