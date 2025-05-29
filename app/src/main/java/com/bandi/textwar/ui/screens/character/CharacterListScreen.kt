@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,6 +45,19 @@ fun CharacterListScreen(
     val characters by viewModel.characters.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    val opponentCharacter by viewModel.opponentCharacter.collectAsState()
+    val isFindingOpponent by viewModel.isFindingOpponent.collectAsState()
+
+    // 상대 찾기 성공 시 BattleResultScreen으로 이동 (opponentCharacter가 null이 아니게 되면 실행)
+    opponentCharacter?.let {
+        // BattleResultScreen 구현 후 실제 이동 로직으로 대체
+        Timber.d("상대 찾음: ${it.characterName}, ID: ${it.id}. BattleResultScreen으로 이동합니다.")
+        navController.navigate("battle_result/${it.id}") {
+            // 이전 화면으로 돌아오지 않도록 설정할 수 있음
+            // popUpTo("character_list") { inclusive = true }
+        }
+        viewModel.clearOpponent() // 이동 후 상대 정보 초기화
+    }
 
     Scaffold { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
@@ -73,9 +88,15 @@ fun CharacterListScreen(
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
                         items(characters) { character ->
-                            CharacterItem(character = character, onClick = {
-                                navController.navigate("character_detail/${character.id}")
-                            })
+                            CharacterItem(
+                                character = character,
+                                onBattleClick = {
+                                    viewModel.findOpponent()
+                                },
+                                onDetailClick = {
+                                    navController.navigate("character_detail/${character.id}")
+                                }
+                            )
                         }
                     }
                 }
@@ -96,23 +117,65 @@ fun CharacterListScreen(
                     Text("로그아웃")
                 }
             }
+
+            // 배틀 대기 로딩 화면
+            if (isFindingOpponent) {
+                Box(
+                    modifier = Modifier.fillMaxSize().align(Alignment.Center).padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AlertDialog(
+                        onDismissRequest = { /* 로딩 중에는 닫을 수 없음 */ },
+                        title = { Text("대결 상대 검색 중") },
+                        text = {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                CircularProgressIndicator()
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text("잠시만 기다려주세요...")
+                            }
+                        },
+                        confirmButton = { }
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun CharacterItem(character: CharacterSummary, onClick: () -> Unit) {
+fun CharacterItem(
+    character: CharacterSummary, 
+    onBattleClick: () -> Unit, 
+    onDetailClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = onClick
+        // Card 전체를 클릭하면 상세 화면으로 이동
+        // onClick = onDetailClick // 기존 onClick 제거
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = character.characterName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = character.description, style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(8.dp))
+            // 버튼들을 오른쪽 정렬하기 위한 Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End // 버튼들을 오른쪽으로 정렬
+            ) {
+                Button(onClick = onDetailClick) {
+                    Text("상세보기")
+                }
+                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                Button(onClick = onBattleClick) {
+                    Text("배틀 시작")
+                }
+            }
         }
     }
 }
@@ -163,7 +226,11 @@ fun CharacterListScreenPreview_WithData() {
                     contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
                     items(sampleCharacters) { character ->
-                        CharacterItem(character = character, onClick = {})
+                        CharacterItem(
+                            character = character, 
+                            onBattleClick = {}, 
+                            onDetailClick = {}
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.weight(0.1f))

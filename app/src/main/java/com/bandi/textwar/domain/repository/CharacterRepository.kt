@@ -18,6 +18,13 @@ interface CharacterRepository {
     suspend fun getCurrentUserCharacters(): Flow<List<CharacterSummary>>
 
     /**
+     * 현재 로그인한 사용자가 소유하지 않은 캐릭터 중에서 무작위로 하나를 가져온다.
+     * @param count 가져올 상대 캐릭터 후보 수 (기본값 50)
+     * @return 선택된 상대 캐릭터 또는 null (후보가 없을 경우)
+     */
+    suspend fun getRandomOpponentCharacter(count: Int = 50): Flow<CharacterDetail?>
+
+    /**
      * 특정 ID의 캐릭터 상세 정보를 가져온다.
      * @param characterId 가져올 캐릭터의 ID
      */

@@ -7,6 +7,7 @@ import com.bandi.textwar.data.models.UserProfile
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.JsonElement
@@ -35,6 +36,29 @@ class CharacterRemoteDataSource @Inject constructor(
             }
             .decodeList<CharacterSummary>() // 결과를 CharacterSummary 리스트로 디코딩
 
+        emit(result)
+    }
+
+    /**
+     * 현재 로그인한 사용자가 소유하지 않은 캐릭터 목록을 Supabase에서 가져온다.
+     * @param count 가져올 상대 캐릭터 후보 수
+     * @return 상대 캐릭터 후보 목록
+     */
+    fun getOpponentCandidateCharacters(count: Int): Flow<List<CharacterDetail>> = flow {
+        val currentUserId = supabaseClient.auth.currentUserOrNull()?.id
+            ?: throw IllegalStateException("사용자가 로그인되어 있지 않습니다.")
+        
+        // MVP에서는 상대 선택 로직을 일부러 3초간 지연
+        delay(3000)
+
+        val result = supabaseClient.postgrest.from("characters")
+            .select {
+                filter {
+                    neq("user_id", currentUserId) // 현재 사용자 ID와 다른 캐릭터만 선택
+                }
+                limit(count.toLong()) // 지정된 수만큼 제한
+            }
+            .decodeList<CharacterDetail>()
         emit(result)
     }
 
