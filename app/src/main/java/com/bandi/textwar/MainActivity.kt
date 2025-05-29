@@ -34,14 +34,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     LoginState.LoggedOut -> {
-                        AuthNavigation(
-                            onLoginSuccess = {
-                                // 이 콜백은 AuthNavigation -> LoginScreen을 통해 호출됨
-                                // loginState가 AuthViewModel 내부에서 LoginState.LoggedIn으로 변경될 것이므로
-                                // 이 when 문이 recomposition되어 MainAppScreen으로 자동 전환됨
-                                // 특별한 액션이 필요하다면 여기에 추가
-                            }
-                        )
+                        AuthNavigation()
                     }
                 }
             }
