@@ -7,9 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -25,13 +30,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.bandi.textwar.presentation.viewmodels.CharacterCreationViewModel
-import com.bandi.textwar.presentation.viewmodels.SaveCharacterState
-import com.bandi.textwar.presentation.viewmodels.SlotCheckState
+import androidx.navigation.NavController
+import com.bandi.textwar.presentation.viewmodels.character.CharacterCreationViewModel
+import com.bandi.textwar.presentation.viewmodels.character.SaveCharacterState
+import com.bandi.textwar.presentation.viewmodels.character.SlotCheckState
 import com.bandi.textwar.ui.theme.TextWarTheme
 
 const val MAX_CHAR_DESCRIPTION_LENGTH = 100
@@ -39,6 +47,7 @@ const val MAX_CHAR_DESCRIPTION_LENGTH = 100
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterCreationScreen(
+    navController: NavController,
     viewModel: CharacterCreationViewModel = hiltViewModel(),
     onSaveSuccessNavigation: () -> Unit
 ) {
@@ -72,7 +81,14 @@ fun CharacterCreationScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                ),
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로 가기", tint = Color.White)
+                    }
+                },
             )
         }
     ) { paddingValues ->
@@ -163,6 +179,6 @@ fun CharacterCreationScreen(
 @Composable
 fun CharacterCreationScreenPreview() {
     TextWarTheme {
-        CharacterCreationScreen(onSaveSuccessNavigation = {})
+        CharacterCreationScreen(navController = NavController(LocalContext.current), onSaveSuccessNavigation = {})
     }
 } 
