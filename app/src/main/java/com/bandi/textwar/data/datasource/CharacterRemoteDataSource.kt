@@ -7,10 +7,13 @@ import com.bandi.textwar.data.models.UserProfile
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import javax.inject.Inject
 
 /**
@@ -114,6 +117,53 @@ class CharacterRemoteDataSource @Inject constructor(
             .select { filter { eq("user_id", userId) } }
             .decodeList<JsonElement>()
         return response.size
+    }
+
+    /**
+     * 캐릭터의 전투 통계를 업데이트합니다. (승리 또는 패배)
+     * Supabase RPC 함수를 호출하여 원자적으로 카운트를 업데이트합니다.
+     * @param characterId 업데이트할 캐릭터의 ID
+     * @param isWin 승리했는지 여부 (true면 승리, false면 패배)
+     */
+    suspend fun updateCharacterBattleStats(characterId: String, isWin: Boolean) {
+        val rpcFunction = if (isWin) "increment_wins" else "increment_losses"
+        supabaseClient.postgrest.rpc(
+            function = rpcFunction,
+            parameters = buildJsonObject {
+                put("character_id_param", JsonPrimitive(characterId))
+            }
+        )
+        // RPC 호출은 보통 반환값이 없거나, 있더라도 이 함수에서는 사용하지 않으므로 별도의 decode는 필요 없습니다.
+    }
+
+    /**
+     * 특정 캐릭터의 마지막 전투 시간을 가져옵니다.
+     * @param characterId 확인할 캐릭터의 ID
+     * @return 마지막 전투 시간 (timestamp with time zone) 또는 null (정보가 없는 경우)
+     */
+    suspend fun getCharacterLastBattleTimestamp(characterId: String): String? {
+        val result = supabaseClient.postgrest.from("characters")
+            // 특정 컬럼만 선택
+            .select(columns = Columns.list("last_battle_timestamp")) {
+                filter { eq("id", characterId) }
+            }
+            .decodeSingleOrNull<Map<String, String?>>() // 단일 객체 또는 null로 디코딩
+
+        return result?.get("last_battle_timestamp")
+    }
+
+    /**
+     * 특정 캐릭터의 마지막 전투 시간을 현재 시간으로 업데이트합니다.
+     * Supabase RPC 함수 'update_character_last_battle_timestamp'를 호출합니다.
+     * @param characterId 업데이트할 캐릭터의 ID
+     */
+    suspend fun updateCharacterLastBattleTimestamp(characterId: String) {
+        supabaseClient.postgrest.rpc(
+            function = "update_character_last_battle_timestamp", // Supabase에 생성된 RPC 함수 이름
+            parameters = buildJsonObject {
+                put("character_id_param", JsonPrimitive(characterId))
+            }
+        )
     }
 
     // TODO: 캐릭터 수정, 삭제 등의 함수 추가 필요

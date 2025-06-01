@@ -29,13 +29,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bandi.textwar.data.models.CharacterDetail
 import com.bandi.textwar.presentation.viewmodels.character.CharacterDetailViewModel
-import com.bandi.textwar.ui.theme.TextWarTheme
 import timber.log.Timber
 
 @Composable
@@ -133,68 +131,5 @@ fun simpleDateFormat(timestamp: String): String {
     } catch (e: Exception) {
         Timber.e(e.toString())
         timestamp // 파싱 실패 시 원본 반환
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun CharacterDetailScreenPreview_Loading() {
-    TextWarTheme {
-        // ViewModel 모의 필요
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CharacterDetailScreenPreview_Error() {
-    TextWarTheme {
-        // ViewModel 모의 필요
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("캐릭터 정보를 불러오는데 실패했습니다.", color = MaterialTheme.colorScheme.error)
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CharacterDetailScreenPreview_Content() {
-    TextWarTheme {
-        val sampleDetail = CharacterDetail(
-            id = "sample-id",
-            userId = "user-id",
-            characterName = "강력한 테스트 전사",
-            description = "이것은 매우 상세하고 긴 설명입니다. 이 캐릭터는 테스트를 위해 특별히 설계되었으며, 다양한 능력을 보유하고 있습니다.",
-            wins = 120,
-            losses = 35,
-            rating = 2350,
-            createdAt = "2023-10-26T10:00:00.000Z",
-            lastBattleTimestamp = "2023-11-15T14:30:00.000Z"
-        )
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(sampleDetail.characterName) },
-                    navigationIcon = {
-                        IconButton(onClick = { /* navController.popBackStack() */ }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로 가기")
-                        }
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CharacterDetailContent(detail = sampleDetail)
-            }
-        }
     }
 }

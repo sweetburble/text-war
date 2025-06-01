@@ -21,19 +21,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.bandi.textwar.data.models.CharacterSummary
 import com.bandi.textwar.presentation.viewmodels.character.CharacterListViewModel
-import com.bandi.textwar.ui.theme.TextWarTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
@@ -47,16 +53,35 @@ fun CharacterListScreen(
     val error by viewModel.error.collectAsState()
     val opponentCharacter by viewModel.opponentCharacter.collectAsState()
     val isFindingOpponent by viewModel.isFindingOpponent.collectAsState()
+    val myCharacterIdForBattle by viewModel.myCharacterIdForBattle.collectAsState() // 나의 캐릭터 ID 상태 관찰
+    val characterCooldowns by viewModel.characterCooldowns.collectAsState() // 캐릭터별 쿨다운 상태 관찰
 
-    // 상대 찾기 성공 시 BattleResultScreen으로 이동 (opponentCharacter가 null이 아니게 되면 실행)
-    opponentCharacter?.let {
+    // 오류 메시지 표시 로직 (쿨다운 메시지 포함)
+    if (error != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearError() }, // 외부 클릭 시 닫기
+            title = { Text("알림") },
+            text = { Text(error.toString()) },
+            confirmButton = {
+                Button(onClick = { viewModel.clearError() }) {
+                    Text("확인")
+                }
+            }
+        )
+    }
+
+    // 상대 찾기 성공 시 BattleResultScreen으로 이동
+    // (opponentCharacter와 myCharacterIdForBattle가 모두 null이 아니게 되면 실행)
+    if (opponentCharacter != null && myCharacterIdForBattle != null) {
+        val currentOpponent = opponentCharacter
+        val currentMyCharacterId = myCharacterIdForBattle
         // BattleResultScreen 구현 후 실제 이동 로직으로 대체
-        Timber.d("상대 찾음: ${it.characterName}, ID: ${it.id}. BattleResultScreen으로 이동합니다.")
-        navController.navigate("battle_result/${it.id}") {
+        Timber.d("나의 캐릭터 ID: $currentMyCharacterId, 상대 찾음: ${currentOpponent?.characterName}, ID: ${currentOpponent?.id}. BattleResultScreen으로 이동합니다.")
+        navController.navigate("battle_result/$currentMyCharacterId/${currentOpponent?.id}") {
             // 이전 화면으로 돌아오지 않도록 설정할 수 있음
             // popUpTo("character_list") { inclusive = true }
         }
-        viewModel.clearOpponent() // 이동 후 상대 정보 초기화
+        viewModel.clearBattleContext() // 이동 후 컨텍스트 초기화 (clearOpponent에서 변경)
     }
 
     Scaffold { innerPadding ->
@@ -72,13 +97,6 @@ fun CharacterListScreen(
 
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                } else if (error != null) {
-                    Timber.e(error.toString())
-                    Text(
-                        text = error ?: "알 수 없는 오류가 발생했습니다.",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
                 } else if (characters.isEmpty()) {
                     Text("생성된 캐릭터가 없습니다.", modifier = Modifier.align(Alignment.CenterHorizontally))
                 } else {
@@ -88,10 +106,36 @@ fun CharacterListScreen(
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
                         items(characters) { character ->
+                            // 각 캐릭터 아이템에 대해 쿨다운 정보 가져오기
+                            val currentCooldownInfo = characterCooldowns[character.id]
+                            var remainingTime by remember(character.id, currentCooldownInfo?.second) { mutableLongStateOf(currentCooldownInfo?.second ?: 0L) }
+                            var isInCooldown by remember(character.id, currentCooldownInfo?.first) { mutableStateOf(currentCooldownInfo?.first == true) }
+
+                            // LaunchedEffect의 key에 character.id와 currentCooldownInfo의 내부 값들을 직접 사용하여
+                            // 아이템이 재사용되거나 ViewModel의 정보가 변경될 때마다 Effect가 올바르게 재시작되도록 함
+                            LaunchedEffect(key1 = character.id, key2 = currentCooldownInfo?.first, key3 = currentCooldownInfo?.second) {
+                                isInCooldown = currentCooldownInfo?.first == true
+                                remainingTime = currentCooldownInfo?.second ?: 0L
+                                if (isInCooldown && remainingTime > 0) {
+                                    launch {
+                                        while (isActive && remainingTime > 0) {
+                                            delay(1000L)
+                                            remainingTime = (remainingTime - 1).coerceAtLeast(0L)
+                                            if (remainingTime == 0L) {
+                                                isInCooldown = false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             CharacterItem(
                                 character = character,
+                                characterCooldown = Pair(isInCooldown, remainingTime),
                                 onBattleClick = {
-                                    viewModel.findOpponent()
+                                    if (!isInCooldown) { // UI 단에서 한번 더 체크
+                                        viewModel.findOpponent(character.id)
+                                    }
                                 },
                                 onDetailClick = {
                                     navController.navigate("character_detail/${character.id}")
@@ -147,7 +191,8 @@ fun CharacterListScreen(
 @Composable
 fun CharacterItem(
     character: CharacterSummary, 
-    onBattleClick: () -> Unit, 
+    characterCooldown: Pair<Boolean, Long>?, // 해당 캐릭터의 쿨다운 정보 (쿨다운 중인가, 남은 시간)
+    onBattleClick: (myCharacterId: String) -> Unit,
     onDetailClick: () -> Unit
 ) {
     Card(
@@ -155,8 +200,6 @@ fun CharacterItem(
             .fillMaxWidth()
             .padding(horizontal = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        // Card 전체를 클릭하면 상세 화면으로 이동
-        // onClick = onDetailClick // 기존 onClick 제거
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = character.characterName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
@@ -172,71 +215,20 @@ fun CharacterItem(
                     Text("상세보기")
                 }
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                Button(onClick = onBattleClick) {
-                    Text("배틀 시작")
-                }
-            }
-        }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun CharacterListScreenPreview_Empty() {
-    TextWarTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("캐릭터 목록", style = MaterialTheme.typography.headlineMedium)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("생성된 캐릭터가 없습니다.")
-            Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) { Text("새 캐릭터 생성") }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) { Text("로그아웃") }
-        }
-    }
-}
+                val isInCooldown = characterCooldown?.first == true
+                val remainingCooldownTime = characterCooldown?.second ?: 0L
 
-@Preview(showBackground = true)
-@Composable
-fun CharacterListScreenPreview_WithData() {
-    TextWarTheme {
-        val navController = rememberNavController()
-        val sampleCharacters = listOf(
-            CharacterSummary(id = "1", characterName = "용감한 기사", description = "정의를 위해 싸우는 용감한 기사입니다."),
-            CharacterSummary(id = "2", characterName = "신비로운 마법사", description = "고대 마법을 사용하는 신비로운 존재입니다.")
-        )
-        // ViewModel의 실제 동작을 모방하기 어려우므로, UI 구조만 확인
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("캐릭터 목록", style = MaterialTheme.typography.headlineMedium)
-                Spacer(modifier = Modifier.height(16.dp))
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp)
+                Button(
+                    onClick = { onBattleClick(character.id) },
+                    enabled = !isInCooldown // 쿨다운 중이 아닐 때만 활성화
                 ) {
-                    items(sampleCharacters) { character ->
-                        CharacterItem(
-                            character = character, 
-                            onBattleClick = {}, 
-                            onDetailClick = {}
-                        )
+                    if (isInCooldown && remainingCooldownTime > 0L) {
+                        Text("대기 (${remainingCooldownTime}초)")
+                    } else {
+                        Text("배틀 시작")
                     }
                 }
-                Spacer(modifier = Modifier.weight(0.1f))
-                Button(onClick = { navController.navigate("create_character") }, modifier = Modifier.fillMaxWidth()) { Text("새 캐릭터 생성") }
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = { /* onLogoutClick */ }, modifier = Modifier.fillMaxWidth()) { Text("로그아웃") }
             }
         }
     }

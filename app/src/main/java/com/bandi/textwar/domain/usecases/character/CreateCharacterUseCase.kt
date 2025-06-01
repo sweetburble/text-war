@@ -1,6 +1,5 @@
-package com.bandi.textwar.domain.usecases
+package com.bandi.textwar.domain.usecases.character
 
-import com.bandi.textwar.data.models.CharacterDetail
 import com.bandi.textwar.data.models.CharacterInsert
 import com.bandi.textwar.domain.repository.CharacterRepository
 import kotlinx.coroutines.flow.Flow

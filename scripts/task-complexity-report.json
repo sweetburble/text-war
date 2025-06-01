@@ -59,10 +59,10 @@
         },
         {
             "taskId": 7,
-            "taskTitle": "Gemini API Integration (Text-Only Battle Logic)",
+            "taskTitle": "OpenAI GPT API Integration (Text-Only Battle Logic)",
             "complexityScore": 7,
             "recommendedSubtasks": 8,
-            "expansionPrompt": "Break down 'Gemini API Integration (Text-Only Battle Logic)' into subtasks for: adding Google AI SDK, secure API key setup, Gemini model initialization, prompt construction, making the API call, parsing the battle narrative and winner from the response, and initial error handling.",
+            "expansionPrompt": "Break down 'OpenAI GPT API Integration (Text-Only Battle Logic)' into subtasks for: adding OpenAI GPT AI SDK, secure API key setup, OpenAI GPT model initialization, prompt construction, making the API call, parsing the battle narrative and winner from the response, and initial error handling.",
             "reasoning": "Integrating a new external AI SDK, managing API keys securely, prompt engineering, API communication, and response parsing are all non-trivial."
         },
         {
@@ -91,10 +91,10 @@
         },
         {
             "taskId": 11,
-            "taskTitle": "Gemini API Integration (Image Generation)",
+            "taskTitle": "OpenAI GPT API Integration (Image Generation)",
             "complexityScore": 7,
             "recommendedSubtasks": 8,
-            "expansionPrompt": "Break down 'Gemini API Integration (Image Generation)' into subtasks for: selecting the Gemini image generation model, setting up API access, constructing image prompts from battle narratives, making the API call, handling the image response (URL/data), and initial error handling.",
+            "expansionPrompt": "Break down 'OpenAI GPT API Integration (Image Generation)' into subtasks for: selecting the OpenAI GPT image generation model, setting up API access, constructing image prompts from battle narratives, making the API call, handling the image response (URL/data), and initial error handling.",
             "reasoning": "Similar to text AI integration but for images; involves model selection, specific prompting for visuals, and handling image data/URLs."
         },
         {
@@ -102,7 +102,7 @@
             "taskTitle": "Battle Result Image Display & Optional Caching",
             "complexityScore": 5,
             "recommendedSubtasks": 8,
-            "expansionPrompt": "Break down 'Battle Result Image Display & Optional Caching' into subtasks for: integrating an image loading library, updating the UI to display an image, loading the image from Gemini's output, and handling loading states. Include optional subtasks for setting up Supabase Storage for images and implementing image upload/retrieval via Storage.",
+            "expansionPrompt": "Break down 'Battle Result Image Display & Optional Caching' into subtasks for: integrating an image loading library, updating the UI to display an image, loading the image from OpenAI GPT's output, and handling loading states. Include optional subtasks for setting up Supabase Storage for images and implementing image upload/retrieval via Storage.",
             "reasoning": "Requires an image loading library and UI work. Optional Supabase Storage integration adds significant steps for image persistence and management."
         },
         {
@@ -158,15 +158,15 @@
             "taskTitle": "Comprehensive Error Handling & Loading States",
             "complexityScore": 6,
             "recommendedSubtasks": 9,
-            "expansionPrompt": "Break down 'Comprehensive Error Handling & Loading States' into subtasks for: systematically reviewing and implementing error handling for Supabase calls (Auth, Postgrest, Storage), Gemini API calls (text, image), and Google Play Billing. Include subtasks for designing consistent UI for errors and loading states, and testing these scenarios.",
+            "expansionPrompt": "Break down 'Comprehensive Error Handling & Loading States' into subtasks for: systematically reviewing and implementing error handling for Supabase calls (Auth, Postgrest, Storage), OpenAI GPT API calls (text, image), and Google Play Billing. Include subtasks for designing consistent UI for errors and loading states, and testing these scenarios.",
             "reasoning": "Pervasive task requiring systematic review across all external interactions and UI components to ensure robustness and good user feedback."
         },
         {
             "taskId": 20,
-            "taskTitle": "Advanced Prompt Engineering for Gemini",
+            "taskTitle": "Advanced Prompt Engineering for OpenAI GPT",
             "complexityScore": 5,
             "recommendedSubtasks": 7,
-            "expansionPrompt": "Break down 'Advanced Prompt Engineering for Gemini' into subtasks for: researching prompt engineering techniques, experimenting with various prompt structures for battle narratives and winner declaration (e.g., in AI Studio), evaluating prompt effectiveness, documenting successful prompts, and integrating them into the app.",
+            "expansionPrompt": "Break down 'Advanced Prompt Engineering for OpenAI GPT' into subtasks for: researching prompt engineering techniques, experimenting with various prompt structures for battle narratives and winner declaration (e.g., in AI Studio), evaluating prompt effectiveness, documenting successful prompts, and integrating them into the app.",
             "reasoning": "Iterative and research-heavy, focusing on optimizing AI output quality rather than complex coding. Involves experimentation and qualitative analysis."
         }
     ]

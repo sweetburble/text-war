@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bandi.textwar.data.models.CharacterDetail
-import com.bandi.textwar.domain.usecases.GetCharacterDetailUseCase
+import com.bandi.textwar.domain.usecases.character.GetCharacterDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

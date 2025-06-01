@@ -2,8 +2,8 @@ package com.bandi.textwar.presentation.viewmodels.character
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bandi.textwar.domain.usecases.CheckCharacterSlotAvailabilityUseCase
-import com.bandi.textwar.domain.usecases.CreateCharacterUseCase
+import com.bandi.textwar.domain.usecases.character.CheckCharacterSlotAvailabilityUseCase
+import com.bandi.textwar.domain.usecases.character.CreateCharacterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -10,15 +10,15 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
     *   **Why it's important:** 게임의 핵심 요소로, 사용자의 창의성을 극대화하고 자신만의 독특한 캐릭터를 소유하는 즐거움을 제공합니다.
     *   **How it works at a high level:** 사용자가 앱 내 입력 필드에 캐릭터 설명을 작성하면, 해당 텍스트는 사용자 계정과 함께 Supabase 데이터베이스에 저장됩니다.
 
-2.  **AI 기반 배틀 시스템 (Gemini 2.5 Flash)**
-    *   **What it does:** 두 캐릭터의 텍스트 설명을 입력받아, Gemini AI 모델이 배틀의 과정과 결과를 판정하고 서술합니다.
+2.  **AI 기반 배틀 시스템 (OpenAI GPT-4.1-mini)**
+    *   **What it does:** 두 캐릭터의 텍스트 설명을 입력받아, OpenAI GPT AI 모델이 배틀의 과정과 결과를 판정하고 서술합니다.
     *   **Why it's important:** 매번 새롭고 예측 불가능한 배틀 경험을 제공하며, AI의 창의적인 스토리텔링을 통해 사용자에게 재미를 선사합니다.
-    *   **How it works at a high level:** 배틀 시작 시, 두 캐릭터의 설명 텍스트를 Gemini API에 전달합니다. AI는 이 정보를 바탕으로 배틀 상황, 승패, 주요 장면 등을 포함한 결과를 생성하여 반환합니다.
+    *   **How it works at a high level:** 배틀 시작 시, 두 캐릭터의 설명 텍스트를 OpenAI GPT API에 전달합니다. AI는 이 정보를 바탕으로 배틀 상황, 승패, 주요 장면 등을 포함한 결과를 생성하여 반환합니다.
 
 3.  **배틀 결과 시각화**
     *   **What it does:** AI가 생성한 배틀 결과(승/패), 배틀 상황 해설 텍스트, 그리고 이 해설을 기반으로 생성된 한 장의 이미지를 사용자에게 보여줍니다.
     *   **Why it's important:** 텍스트 기반의 배틀에 시각적인 요소를 더하여 몰입감을 높이고, 배틀의 하이라이트를 직관적으로 전달합니다.
-    *   **How it works at a high level:** Gemini API로부터 배틀 해설 텍스트를 받은 후, 이 텍스트를 다시 Gemini API(이미지 생성 기능)에 전달하여 관련 이미지를 생성하고, 결과 텍스트와 함께 화면에 표시합니다.
+    *   **How it works at a high level:** OpenAI GPT API로부터 배틀 해설 텍스트를 받은 후, 이 텍스트를 다시 OpenAI GPT API(이미지 생성 기능)에 전달하여 관련 이미지를 생성하고, 결과 텍스트와 함께 화면에 표시합니다.
 
 4.  **캐릭터 슬롯 및 배틀 쿨타임 관리 (유료화 모델)**
     *   **What it does:** 기본 제공되는 캐릭터 슬롯 외에 추가 슬롯을 구매하거나, 배틀 후 발생하는 쿨타임을 유료 재화(토큰)를 사용하여 즉시 해제할 수 있습니다.
@@ -64,13 +64,13 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
 #### Technical Architecture
 
 *   **System Components:**
-    *   **Android Client App:** Jetpack Compose (UI), Kotlin (Logic), ViewModel, Coroutines, Retrofit (for Gemini API).
+    *   **Android Client App:** Jetpack Compose (UI), Kotlin (Logic), ViewModel, Coroutines, Retrofit (for OpenAI GPT API).
     *   **Backend:** Supabase
         *   **Supabase Auth:** 사용자 로그인 및 계정 관리 (이메일/비밀번호, 소셜 로그인 등).
         *   **Supabase Database (PostgreSQL):** 사용자 데이터, 캐릭터 데이터, 배틀 기록, 리더보드 데이터 저장.
         *   **Supabase Edge Functions (Optional):** 서버 측 로직 처리 (예: 복잡한 리더보드 집계, AI 호출 프록시).
         *   **Supabase Storage (Optional):** AI가 생성한 이미지를 캐싱하거나 저장할 경우 사용.
-    *   **AI Model:** Google Gemini 2.5 Flash API (텍스트 기반 배틀 판정, 해설 생성, 이미지 생성).
+    *   **AI Model:** OpenAI GPT-4.1-mini API (텍스트 기반 배틀 판정, 해설 생성, 이미지 생성).
     *   **Payment Gateway:** Google Play Billing Library.
 
 *   **Data Models (Supabase - PostgreSQL Tables):**
@@ -101,7 +101,7 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
         *   `created_at` (TIMESTAMP WITH TIME ZONE, default: `now()`)
 
 *   **APIs and Integrations:**
-    *   **Gemini API:**
+    *   **OpenAI GPT API:**
         *   Endpoint for text generation (battle narrative, result).
         *   Endpoint for image generation (based on battle narrative).
         *   Secure API key management.
@@ -109,8 +109,8 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
     *   **Google Play Billing Library:** For in-app purchases.
 
 *   **Infrastructure Requirements:**
-    *   Supabase Project (Free or Pro plan depending on usage, especially for Edge Functions and outbound networking for Gemini API).
-    *   Google Cloud Project (for enabling Gemini API and managing API keys).
+    *   Supabase Project (Free or Pro plan depending on usage, especially for Edge Functions and outbound networking for OpenAI GPT API).
+    *   OpenAI GPT Project (for enabling OpenAI GPT API and managing API keys).
     *   Android Development Environment (Android Studio).
 
 #### Development Roadmap
@@ -126,7 +126,7 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
         *   기본 캐릭터 슬롯 1개 제공.
     3.  **Core AI Battle Logic (Text Only):**
         *   사용자 캐릭터 1개와 임의의 상대 캐릭터(더미 데이터 또는 다른 유저 캐릭터 중 랜덤 선택) 선택 기능.
-        *   선택된 두 캐릭터의 설명을 Gemini API (text generation)에 전달.
+        *   선택된 두 캐릭터의 설명을 OpenAI GPT API (text generation)에 전달.
         *   AI가 반환하는 배틀 결과 (승/패 판정 포함) 및 배틀 해설 텍스트 수신.
     4.  **Basic Battle Result UI:**
         *   수신된 배틀 결과 텍스트(승/패, 해설)를 화면에 표시.
@@ -137,7 +137,7 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
 *   **Future Enhancements (Post-MVP):**
     *   **Phase 2 (Visuals, Monetization Basics, Competition):**
         1.  **AI Image Generation in Battles:**
-            *   Gemini API (image generation) 연동.
+            *   OpenAI GPT API (image generation) 연동.
             *   배틀 해설 텍스트를 기반으로 이미지 생성 요청.
             *   생성된 이미지를 배틀 결과 화면에 표시 (필요시 Supabase Storage 사용).
         2.  **Basic Leaderboard:**
@@ -168,7 +168,7 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
             *   배틀 쿨타임 종료 알림.
             *   리더보드 순위 변동 알림 (Optional).
         5.  **Improved AI Prompting:**
-            *   더욱 다양하고 흥미로운 배틀 시나리오를 위한 Gemini 프롬프트 연구 및 개선.
+            *   더욱 다양하고 흥미로운 배틀 시나리오를 위한 OpenAI GPT 프롬프트 연구 및 개선.
         6.  **Tutorial / Onboarding Flow:**
             *   신규 사용자를 위한 게임 방법 안내.
 
@@ -181,7 +181,7 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
         3.  **Advanced Character Customization (Beyond Text):**
             *   미리 정의된 아바타 선택 또는 간단한 커스터마이징 요소 추가.
         4.  **AI Model Upgrades:**
-            *   새로운 Gemini 모델 또는 기능 활용.
+            *   새로운 OpenAI GPT 모델 또는 기능 활용.
 
 #### Logical Dependency Chain
 
@@ -195,14 +195,14 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
     *   **Character Display:** Supabase Database에서 내 캐릭터 목록 읽어와서 표시.
     *   **Opponent Selection:** (MVP 단계에서는) Supabase Database의 모든 캐릭터 중 랜덤으로 하나 선택, 또는 고정된 더미 캐릭터 사용.
     *   **Battle Execution (Text Only):**
-        *   두 캐릭터의 `description`을 가져와 Gemini API (text-only) 호출 준비.
-        *   Gemini API 호출 및 응답 (배틀 해설, 승패) 수신.
+        *   두 캐릭터의 `description`을 가져와 OpenAI GPT API (text-only) 호출 준비.
+        *   OpenAI GPT API 호출 및 응답 (배틀 해설, 승패) 수신.
     *   **Battle Result Display:** 수신된 텍스트를 그대로 화면에 표시.
     *   **Data Update:** 배틀 결과에 따라 캐릭터의 `wins`/`losses` 업데이트 (Supabase Database).
 
 3.  **Iterative Improvements & Feature Additions (Atomic & Buildable):**
     *   **Battle Cooldown:** `last_battle_timestamp` 저장 및 확인 로직 추가 (캐릭터 또는 유저 단위, Supabase Database).
-    *   **AI Image Generation:** 기존 배틀 로직에 Gemini 이미지 생성 API 호출 추가, 결과 화면에 이미지 표시 영역 추가.
+    *   **AI Image Generation:** 기존 배틀 로직에 OpenAI GPT 이미지 생성 API 호출 추가, 결과 화면에 이미지 표시 영역 추가.
     *   **Basic Leaderboard:** Supabase Database 쿼리로 `characters` 테이블에서 `wins` 기준으로 정렬하여 표시하는 새 화면 추가.
     *   **Character Slot Limit:** `users.character_slots` 확인 로직 추가 (Supabase Database).
     *   **In-App Purchase (Slots):** Google Play Billing 연동 -> 슬롯 구매 UI -> 성공 시 `users.character_slots` 업데이트 (Supabase Database).
@@ -212,9 +212,9 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
 #### Risks and Mitigations
 
 *   **Technical Challenges:**
-    *   **Risk:** Gemini API 응답 시간 및 안정성, 예상치 못한 결과 생성.
-        *   **Mitigation:** API 호출 타임아웃 설정, 재시도 로직 구현. Gemini Studio 등을 통해 프롬프트 엔지니어링을 충분히 테스트하여 일관성 있는 결과 유도. 비동기 처리로 UI 블로킹 방지.
-    *   **Risk:** Gemini API 이미지 생성 품질 및 일관성 부족.
+    *   **Risk:** OpenAI GPT API 응답 시간 및 안정성, 예상치 못한 결과 생성.
+        *   **Mitigation:** API 호출 타임아웃 설정, 재시도 로직 구현. OpenAI GPT Studio 등을 통해 프롬프트 엔지니어링을 충분히 테스트하여 일관성 있는 결과 유도. 비동기 처리로 UI 블로킹 방지.
+    *   **Risk:** OpenAI GPT API 이미지 생성 품질 및 일관성 부족.
         *   **Mitigation:** 이미지 생성 프롬프트를 상세하게 조정. 이미지 생성이 실패하거나 품질이 낮을 경우, 기본 이미지를 표시하거나 텍스트만 보여주는 폴백(fallback) 로직 구현.
     *   **Risk:** Supabase (PostgreSQL) 쿼리 성능 저하 (특히 리더보드).
         *   **Mitigation:** 데이터 모델 설계 시 인덱싱 적극 활용. 필요시 Supabase Edge Functions를 통해 집계 데이터 사전 계산 또는 뷰(View) 활용. MVP에서는 단순 쿼리, 추후 최적화.
@@ -228,12 +228,12 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
         *   **Mitigation:** Supabase와 같은 BaaS를 적극 활용하여 백엔드 개발 부담 최소화. Jetpack Compose의 생산성을 활용. MVP 범위에 집중하고, 이후 단계별로 기능 확장.
 
 *   **AI API Costs & Rate Limits:**
-    *   **Risk:** Gemini API 사용 비용이 예상보다 높아지거나, 호출 빈도로 인한 Rate Limit 도달.
-        *   **Mitigation:** 배틀 쿨타임, 캐릭터별 쿨타임 등을 통해 API 호출 빈도 자연스럽게 조절. Gemini API의 무료 티어 및 가격 정책 숙지. 초기에는 사용량 모니터링하며 필요시 유료화 모델로 비용 충당 고려. Supabase Edge Functions를 프록시로 사용 시, Supabase의 네트워크 비용도 고려.
+    *   **Risk:** OpenAI GPT API 사용 비용이 예상보다 높아지거나, 호출 빈도로 인한 Rate Limit 도달.
+        *   **Mitigation:** 배틀 쿨타임, 캐릭터별 쿨타임 등을 통해 API 호출 빈도 자연스럽게 조절. OpenAI GPT API의 무료 티어 및 가격 정책 숙지. 초기에는 사용량 모니터링하며 필요시 유료화 모델로 비용 충당 고려. Supabase Edge Functions를 프록시로 사용 시, Supabase의 네트워크 비용도 고려.
 
 *   **Content Moderation:**
     *   **Risk:** 사용자가 부적절하거나 공격적인 텍스트로 캐릭터를 생성.
-        *   **Mitigation:** Gemini API 자체의 안전 필터 활용. 초기에는 이 필터에 의존. 추후 사용자 신고 기능 또는 간단한 클라이언트 측 필터링 고려. Supabase의 Row Level Security(RLS)를 활용하여 데이터 접근 제어 강화.
+        *   **Mitigation:** OpenAI GPT API 자체의 안전 필터 활용. 초기에는 이 필터에 의존. 추후 사용자 신고 기능 또는 간단한 클라이언트 측 필터링 고려. Supabase의 Row Level Security(RLS)를 활용하여 데이터 접근 제어 강화.
 
 #### Appendix
 
@@ -248,5 +248,5 @@ Text War는 사용자가 텍스트 설명을 통해 자신만의 고유한 캐�
     *   **Development Language:** Kotlin
     *   **UI Toolkit:** Jetpack Compose
     *   **Architecture:** MVVM (ViewModel, Repository, UseCases)
-    *   **AI Model:** Google Gemini 2.5 Flash (or latest suitable version)
+    *   **AI Model:** OpenAI GPT-4.1-mini (or latest suitable version)
     *   **Backend:** Supabase (Auth, PostgreSQL Database, Storage, Edge Functions)

@@ -61,7 +61,6 @@ class CharacterRepositoryImpl @Inject constructor(
             emit(null)
             return@flow
         }
-        // remoteDataSource.getUserProfile이 suspend 함수이므로 직접 호출
         val userProfile = remoteDataSource.getUserProfile(userId)
         emit(userProfile)
     }
@@ -69,9 +68,21 @@ class CharacterRepositoryImpl @Inject constructor(
     override suspend fun getCurrentUserCharacterCount(): Flow<Int> = flow {
         val userId = supabaseClient.auth.currentUserOrNull()?.id
             ?: throw IllegalStateException("User not authenticated for counting characters.")
-        // remoteDataSource.getCharacterCount가 suspend 함수이므로 직접 호출
         val count = remoteDataSource.getCharacterCount(userId)
         emit(count)
+    }
+
+    override suspend fun updateCharacterBattleStats(characterId: String, isWin: Boolean) {
+        remoteDataSource.updateCharacterBattleStats(characterId, isWin)
+    }
+
+    override suspend fun getCharacterLastBattleTimestamp(characterId: String): Flow<String?> = flow {
+        val timestamp = remoteDataSource.getCharacterLastBattleTimestamp(characterId)
+        emit(timestamp)
+    }
+
+    override suspend fun updateCharacterLastBattleTimestamp(characterId: String) {
+        remoteDataSource.updateCharacterLastBattleTimestamp(characterId)
     }
 
     // TODO: createCharacter 등 다른 Repository 함수 구현

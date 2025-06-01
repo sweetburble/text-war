@@ -49,4 +49,24 @@ interface CharacterRepository {
      * @return 캐릭터 수
      */
     suspend fun getCurrentUserCharacterCount(): Flow<Int>
+
+    /**
+     * 캐릭터의 전투 통계를 업데이트합니다.
+     * @param characterId 업데이트할 캐릭터의 ID
+     * @param isWin 승리 여부 (true면 승리, false면 패배)
+     */
+    suspend fun updateCharacterBattleStats(characterId: String, isWin: Boolean)
+
+    /**
+     * 특정 캐릭터의 마지막 전투 시간을 가져옵니다.
+     * @param characterId 확인할 캐릭터의 ID
+     * @return 마지막 전투 시간 (ISO 8601 형식의 문자열) 또는 null
+     */
+    suspend fun getCharacterLastBattleTimestamp(characterId: String): Flow<String?>
+
+    /**
+     * 특정 캐릭터의 마지막 전투 시간을 현재 시간으로 업데이트합니다.
+     * @param characterId 업데이트할 캐릭터의 ID
+     */
+    suspend fun updateCharacterLastBattleTimestamp(characterId: String)
 } 
