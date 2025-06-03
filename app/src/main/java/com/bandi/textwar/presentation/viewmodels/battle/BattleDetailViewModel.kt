@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bandi.textwar.domain.models.BattleRecord
-import com.bandi.textwar.domain.usecases.battle.GetBattleRecordUseCase
+import com.bandi.textwar.domain.usecases.battle.GetSingleBattleRecordUseCase
 import com.bandi.textwar.ui.navigation.BattleDetailNav // 네비게이션 인자 이름을 위해 import
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +23,7 @@ sealed interface BattleDetailUiState {
 
 @HiltViewModel
 class BattleDetailViewModel @Inject constructor(
-    private val getBattleRecordUseCase: GetBattleRecordUseCase,
+    private val getBattleRecordUseCase: GetSingleBattleRecordUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 

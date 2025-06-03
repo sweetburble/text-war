@@ -207,7 +207,7 @@ fun CharacterItem(
                 horizontalArrangement = Arrangement.End // 버튼들을 오른쪽으로 정렬
             ) {
                 Button(onClick = onDetailClick) {
-                    Text("상세보기")
+                    Text("상세보기", fontWeight = FontWeight.Thin)
                 }
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
