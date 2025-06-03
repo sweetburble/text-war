@@ -32,9 +32,8 @@ class BattleResultViewModel @Inject constructor(
     private val opponentId: String = savedStateHandle.get<String>("opponentId") ?: ""
 
     init {
-        if (myCharacterId.isNotBlank() && opponentId.isNotBlank()) {
-            loadBattleResult(myCharacterId, opponentId)
-        }
+        // 무조건 myCharacterId와 opponentId에 값이 존재한다
+        loadBattleResult(myCharacterId, opponentId)
     }
 
     fun loadBattleResult(myCharId: String, oppId: String) {

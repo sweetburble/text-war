@@ -34,18 +34,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bandi.textwar.data.models.CharacterSummary
 import com.bandi.textwar.presentation.viewmodels.character.CharacterListViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.setValue
+import com.bandi.textwar.ui.navigation.BattleResultNav
+import com.bandi.textwar.ui.navigation.CharacterDetailNav
+import com.bandi.textwar.ui.navigation.CreateCharacterNav
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.setValue
 
 @Composable
 fun CharacterListScreen(
     navController: NavController,
-    onLogoutClick: () -> Unit,
     viewModel: CharacterListViewModel = hiltViewModel() // ViewModel 주입
 ) {
     val characters by viewModel.characters.collectAsState()
@@ -75,13 +77,11 @@ fun CharacterListScreen(
     if (opponentCharacter != null && myCharacterIdForBattle != null) {
         val currentOpponent = opponentCharacter
         val currentMyCharacterId = myCharacterIdForBattle
-        // BattleResultScreen 구현 후 실제 이동 로직으로 대체
         Timber.d("나의 캐릭터 ID: $currentMyCharacterId, 상대 찾음: ${currentOpponent?.characterName}, ID: ${currentOpponent?.id}. BattleResultScreen으로 이동합니다.")
-        navController.navigate("battle_result/$currentMyCharacterId/${currentOpponent?.id}") {
-            // 이전 화면으로 돌아오지 않도록 설정할 수 있음
+        navController.navigate(BattleResultNav.navigateWithArgs(currentMyCharacterId!!, currentOpponent!!.id)) {
             // popUpTo("character_list") { inclusive = true }
         }
-        viewModel.clearBattleContext() // 이동 후 컨텍스트 초기화 (clearOpponent에서 변경)
+        viewModel.clearBattleContext()
     }
 
     Scaffold { innerPadding ->
@@ -138,7 +138,7 @@ fun CharacterListScreen(
                                     }
                                 },
                                 onDetailClick = {
-                                    navController.navigate("character_detail/${character.id}")
+                                    navController.navigate(CharacterDetailNav.navigateWithArg(character.id))
                                 }
                             )
                         }
@@ -148,24 +148,12 @@ fun CharacterListScreen(
                 Spacer(modifier = Modifier.weight(0.1f)) // 버튼들을 하단에 가깝게 배치하기 위한 Spacer
 
                 Button(
-                    onClick = { navController.navigate("battle_history") },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("전투 기록 보기")
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { navController.navigate("create_character") },
+                    onClick = { 
+                        navController.navigate(CreateCharacterNav.route) 
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("새 캐릭터 생성")
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = onLogoutClick,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("로그아웃")
                 }
             }
 
@@ -203,16 +191,16 @@ fun CharacterItem(
     onDetailClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = character.characterName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
+
             Text(text = character.description, style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(8.dp))
+
             // 버튼들을 오른쪽 정렬하기 위한 Row
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.bandi.textwar.ui.screens.battle
 
@@ -6,8 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,7 +24,7 @@ import coil.request.ImageRequest
 import com.bandi.textwar.domain.models.BattleRecord
 import com.bandi.textwar.presentation.viewmodels.battle.BattleHistoryUiState
 import com.bandi.textwar.presentation.viewmodels.battle.BattleHistoryViewModel
-import com.bandi.textwar.R // R 임포트 추가 (플레이스홀더 이미지 등)
+import com.bandi.textwar.R
 
 @Composable
 fun BattleHistoryScreen(
@@ -41,18 +38,7 @@ fun BattleHistoryScreen(
         viewModel.loadBattleHistory(characterId)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(if (characterId == null) "전체 전투 기록" else "캐릭터 전투 기록") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "뒤로 가기")
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
+    Scaffold() { paddingValues ->
         Box(
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
             contentAlignment = Alignment.Center
