@@ -25,7 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bandi.textwar.data.models.CharacterDetail
 import com.bandi.textwar.presentation.viewmodels.character.CharacterDetailViewModel
-import timber.log.Timber
+import com.bandi.textwar.ui.utils.toFormattedBattleTime
 
 @Composable
 fun CharacterDetailScreen(
@@ -78,10 +78,10 @@ fun CharacterDetailContent(detail: CharacterDetail) {
         CharacterStatRow(label = "승리", value = detail.wins.toString())
         CharacterStatRow(label = "패배", value = detail.losses.toString())
         CharacterStatRow(label = "레이팅", value = detail.rating.toString())
-        CharacterStatRow(label = "생성일", value = simpleDateFormat(detail.createdAt))
+        CharacterStatRow(label = "생성일", value = detail.createdAt.toFormattedBattleTime())
 
         detail.lastBattleTimestamp?.let {
-            CharacterStatRow(label = "마지막 전투", value = simpleDateFormat(it))
+            CharacterStatRow(label = "마지막 전투", value = it.toFormattedBattleTime())
         }
     }
 }
@@ -96,15 +96,5 @@ fun CharacterStatRow(label: String, value: String) {
     ) {
         Text(text = label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
         Text(text = value, style = MaterialTheme.typography.bodyMedium)
-    }
-}
-
-// 간단한 날짜 포맷팅 함수 (실제 앱에서는 더 견고한 방식 사용 권장)
-fun simpleDateFormat(timestamp: String): String {
-    return try {
-        timestamp.substringBefore("T") // "YYYY-MM-DDTHH:mm:ss.sssZ" 형식에서 날짜 부분만 추출
-    } catch (e: Exception) {
-        Timber.e(e.toString())
-        timestamp // 파싱 실패 시 원본 반환
     }
 }

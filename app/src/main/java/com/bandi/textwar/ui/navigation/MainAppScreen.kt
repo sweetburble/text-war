@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.bandi.textwar.ui.screens.battle.BattleDetailScreen
 import com.bandi.textwar.ui.screens.battle.BattleHistoryScreen
 import com.bandi.textwar.ui.screens.battle.BattleResultScreen
 import com.bandi.textwar.ui.screens.character.CharacterCreationScreen
@@ -70,6 +71,7 @@ fun MainTopAppBar(navController: NavHostController) {
             CharacterDetailNav.routeWithArgName() -> CharacterDetailNav.title
             BattleResultNav.routeWithArgNames() -> BattleResultNav.title
             CharacterBattleHistoryNav.routeWithArgName() -> CharacterBattleHistoryNav.title
+            BattleDetailNav.routeWithArgName() -> BattleDetailNav.title
             else -> "TextWar"
         }
     }
@@ -167,6 +169,12 @@ fun MainNavigationGraph(
         // 전투 결과 화면
         composable(BattleResultNav.routeWithArgNames(), arguments = BattleResultNav.arguments) {
             BattleResultScreen(navController = navController)
+        }
+
+        // 전투 상세 화면
+        composable(BattleDetailNav.routeWithArgName(), arguments = BattleDetailNav.arguments) {
+            // recordId는 ViewModel에서 SavedStateHandle을 통해 자동으로 주입받으므로, 여기서 명시적으로 넘길 필요 없음
+            BattleDetailScreen(navController = navController)
         }
     }
 } 

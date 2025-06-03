@@ -11,4 +11,8 @@ data class BattleRecord(
     val narrative: String?,
     val imageUrl: String?,
     val createdAt: String, // UI에서 표시하기 편한 형태로 변환될 수 있음 (e.g., Date, ZonedDateTime)
-) 
+
+    val characterAName: String? = null,
+    val characterBName: String? = null,
+    val winnerName: String? = null
+)

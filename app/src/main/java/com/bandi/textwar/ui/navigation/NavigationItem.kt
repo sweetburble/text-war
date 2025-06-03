@@ -1,7 +1,6 @@
 package com.bandi.textwar.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Face6
 import androidx.compose.material.icons.filled.HistoryEdu
 import androidx.compose.material.icons.filled.Leaderboard
@@ -148,6 +147,19 @@ object BattleResultNav : DestinationArg<Pair<String, String>> {
     fun routeWithArgNames(): String = "$route/{$MY_CHARACTER_ID_ARG}/{$OPPONENT_CHARACTER_ID_ARG}"
 }
 
+// 전투 상세 화면 Nav (recordId 인자 받음)
+object BattleDetailNav : DestinationArg<String> {
+    override val route: String = NavigationRouteName.BATTLE_DETAIL
+    override val title: String = NavigationTitle.BATTLE_DETAIL
+    override val argName: String = "recordId"
+    override val deepLinks: List<NavDeepLink> = listOf(navDeepLink { uriPattern = "${NavigationRouteName.DEEP_LINK_SCHEME}$route/{$argName}" })
+    override val arguments: List<NamedNavArgument> = listOf(
+        androidx.navigation.navArgument(argName) { type = androidx.navigation.NavType.StringType }
+    )
+    override fun navigateWithArg(arg: String): String = "$route/$arg"
+    override fun findArgument(navBackStackEntry: NavBackStackEntry): String? = navBackStackEntry.arguments?.getString(argName)
+    override fun routeWithArgName(): String = "$route/{$argName}"
+}
 
 // 캐릭터 ID를 받는 BattleHistory Nav
 object CharacterBattleHistoryNav : DestinationArg<String> {
@@ -181,6 +193,7 @@ object NavigationRouteName {
     const val CREATE_CHARACTER = "create_character"
     const val CHARACTER_DETAIL = "character_detail"
     const val BATTLE_RESULT = "battle_result"
+    const val BATTLE_DETAIL = "battle_detail" // 전투 상세 화면 라우트 이름 추가
 
     // Auth Graph
     const val AUTH_GRAPH = "auth_graph"
@@ -200,4 +213,5 @@ object NavigationTitle {
     const val CHARACTER_DETAIL = "캐릭터 정보"
     const val BATTLE_HISTORY_DETAIL = "전투 기록"
     const val BATTLE_RESULT = "전투 결과"
+    const val BATTLE_DETAIL = "상세 전투 기록" // 전투 상세 화면 제목 추가
 }

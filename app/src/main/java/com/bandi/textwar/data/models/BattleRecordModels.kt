@@ -46,5 +46,14 @@ data class BattleRecordSupabase(
     val imageUrl: String? = null,
 
     @SerialName("created_at")
-    val createdAt: String // Timestamp string, e.g., "2023-10-27T10:30:00+00:00"
+    val createdAt: String, // Timestamp string, e.g., "2023-10-27T10:30:00+00:00"
+
+    @SerialName("character_a_name")
+    val characterAName: String? = null,
+
+    @SerialName("character_b_name")
+    val characterBName: String? = null,
+
+    @SerialName("winner_name")
+    val winnerName: String? = null
 ) 

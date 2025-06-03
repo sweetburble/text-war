@@ -1,4 +1,3 @@
-
 package com.bandi.textwar.ui.screens.battle
 
 import androidx.compose.foundation.Image
@@ -25,6 +24,7 @@ import com.bandi.textwar.domain.models.BattleRecord
 import com.bandi.textwar.presentation.viewmodels.battle.BattleHistoryUiState
 import com.bandi.textwar.presentation.viewmodels.battle.BattleHistoryViewModel
 import com.bandi.textwar.R
+import com.bandi.textwar.ui.utils.toFormattedBattleTime
 
 @Composable
 fun BattleHistoryScreen(
@@ -97,13 +97,18 @@ fun BattleRecordItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("전투 시간: ${record.createdAt}", style = MaterialTheme.typography.labelSmall)
+            Text("전투 시간: ${record.createdAt.toFormattedBattleTime()}", style = MaterialTheme.typography.labelSmall)
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 캐릭터 정보 (A vs B) - 실제 캐릭터 이름을 표시하려면 추가적인 데이터 로드가 필요할 수 있습니다.
-            Text("참가자: ${record.characterAId} vs ${record.characterBId}", style = MaterialTheme.typography.titleMedium)
+            // 참가자 표시: 캐릭터 ID 대신 이름 사용
+            val characterAName = record.characterAName ?: record.characterAId // 이름이 없으면 ID 표시
+            val characterBName = record.characterBName ?: record.characterBId // 이름이 없으면 ID 표시
+            Text("참가자: $characterAName vs $characterBName", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
-            Text("승자: ${record.winnerId ?: "-"}", style = MaterialTheme.typography.titleSmall)
+
+            // 승자 표시: 캐릭터 ID 대신 이름 사용
+            val winnerDisplayName = record.winnerName ?: record.winnerId // 이름이 없으면 ID 표시, 둘 다 없으면 "-"
+            Text("승자: ${winnerDisplayName ?: "-"}", style = MaterialTheme.typography.titleSmall)
             Spacer(modifier = Modifier.height(12.dp))
 
             if (!record.imageUrl.isNullOrEmpty()) {
@@ -135,8 +140,7 @@ fun BattleRecordItem(
 
                 TextButton(
                     onClick = {
-                        // TODO: 전투 상세 보기 화면으로 이동 (선택 사항)
-                        // navController.navigate("battle_detail/${record.id}")
+                        navController.navigate("battle_detail/${record.id}") // 주석 해제 및 실제 네비게이션 호출
                     },
                 ) {
                     Text("더 보기")

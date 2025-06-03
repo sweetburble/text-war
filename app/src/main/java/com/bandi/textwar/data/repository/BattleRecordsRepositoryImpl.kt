@@ -45,5 +45,8 @@ fun BattleRecordSupabase.toDomainModel(): BattleRecord {
         narrative = this.narrative,
         imageUrl = this.imageUrl,
         createdAt = this.createdAt, // 날짜/시간 타입 변환이 필요할 수 있음 (String -> Date, ZonedDateTime 등)
+        characterAName = this.characterAName,
+        characterBName = this.characterBName,
+        winnerName = this.winnerName
     )
 }
