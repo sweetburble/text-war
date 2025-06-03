@@ -4,17 +4,21 @@ import com.bandi.textwar.data.models.CharacterDetail
 import com.bandi.textwar.data.models.CharacterInsert
 import com.bandi.textwar.data.models.CharacterSummary
 import com.bandi.textwar.data.models.UserProfile
+import com.bandi.textwar.data.models.LeaderboardItem
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import javax.inject.Inject
+import timber.log.Timber
 
 /**
  * Supabase를 사용하여, 캐릭터 데이터를 가져오는 Remote DataSource
@@ -166,5 +170,73 @@ class CharacterRemoteDataSource @Inject constructor(
         )
     }
 
-    // TODO: 캐릭터 수정, 삭제 등의 함수 추가 필요
+    /**
+     * 모든 캐릭터 정보를 리더보드용으로 가져옵니다.
+     * users 테이블과 조인하여 유저 닉네임을 함께 가져오고,
+     * rating 높은 순 -> wins 높은 순 -> character_name 문자열 순으로 정렬합니다.
+     */
+    suspend fun getLeaderboardData(): Result<List<LeaderboardItem>> {
+        return try {
+            val result = supabaseClient.postgrest.from("characters")
+                .select(columns = Columns.raw("""
+                    user_id,
+                    character_name,
+                    wins,
+                    losses,
+                    rating,
+                    users ( display_name )
+                """.trimIndent())) {
+                    order(column = "rating", order = Order.DESCENDING)
+                    order(column = "wins", order = Order.DESCENDING)
+                    order(column = "character_name", order = Order.ASCENDING)
+                }
+
+            val dtoList = result.decodeList<CharacterWithUserDto>() // 그 다음 디코딩
+
+            val leaderboardItems = dtoList.map { dto ->
+                LeaderboardItem(
+                    userDisplayName = dto.users?.display_name ?: "알 수 없는 유저",
+                    characterName = dto.character_name,
+                    wins = dto.wins,
+                    losses = dto.losses,
+                    rating = dto.rating
+                )
+            }
+            Result.success(leaderboardItems)
+        } catch (e: Exception) {
+            Timber.e(e, "Error fetching leaderboard data")
+            Result.failure(e)
+        }
+    }
+
+    // Supabase 응답을 매핑하기 위한 내부 DTO
+    @Serializable
+    private data class CharacterWithUserDto(
+        val user_id: String,
+        val character_name: String,
+        val wins: Int,
+        val losses: Int,
+        val rating: Int,
+        val users: UserDto?,
+    )
+
+    @Serializable
+    private data class UserDto(
+        val display_name: String?,
+    )
+
+    suspend fun getCharactersByUserId(userId: String): Result<List<CharacterDetail>> {
+        return try {
+            val characters = supabaseClient.postgrest.from("characters")
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
+                .decodeList<CharacterDetail>()
+            Result.success(characters)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

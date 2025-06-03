@@ -1,10 +1,11 @@
 package com.bandi.textwar.domain.repository
 
-import com.bandi.textwar.data.models.CharacterSummary // 생성한 모델 임포트
-import com.bandi.textwar.data.models.CharacterDetail // 추가
-import com.bandi.textwar.data.models.CharacterInsert // 추가
-import com.bandi.textwar.data.models.UserProfile // 추가
+import com.bandi.textwar.data.models.CharacterSummary
+import com.bandi.textwar.data.models.CharacterDetail
+import com.bandi.textwar.data.models.CharacterInsert
+import com.bandi.textwar.data.models.UserProfile
 import kotlinx.coroutines.flow.Flow
+import com.bandi.textwar.data.models.LeaderboardItem
 
 /**
  * 캐릭터 데이터에 접근하기 위한 Repository 인터페이스
@@ -69,4 +70,8 @@ interface CharacterRepository {
      * @param characterId 업데이트할 캐릭터의 ID
      */
     suspend fun updateCharacterLastBattleTimestamp(characterId: String)
+
+    suspend fun updateCharacter(character: CharacterDetail): Result<Unit>
+
+    suspend fun getLeaderboardData(): Result<List<LeaderboardItem>>
 } 
