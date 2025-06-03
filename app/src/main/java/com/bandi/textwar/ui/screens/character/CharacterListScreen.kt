@@ -148,6 +148,13 @@ fun CharacterListScreen(
                 Spacer(modifier = Modifier.weight(0.1f)) // 버튼들을 하단에 가깝게 배치하기 위한 Spacer
 
                 Button(
+                    onClick = { navController.navigate("battle_history") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("전투 기록 보기")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
                     onClick = { navController.navigate("create_character") },
                     modifier = Modifier.fillMaxWidth()
                 ) {

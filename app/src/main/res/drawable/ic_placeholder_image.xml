@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- 외곽 사각형 프레임 -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@android:color/darker_gray"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M3,5 L21,5 L21,19 L3,19 Z" />
+
+    <!-- 산 모양 (풍경 이미지를 상징) -->
+    <path
+        android:fillColor="@android:color/darker_gray"
+        android:pathData="M9,12 L11,9 L13,11 L16,8 L21,13 L21,19 L3,19 L3,15 Z" />
+
+    <!-- 태양 (circle을 path로 변환) -->
+    <path
+        android:fillColor="@android:color/darker_gray"
+        android:pathData="M5.5,9 A1.5,1.5 0 1,1 8.5,9 A1.5,1.5 0 1,1 5.5,9 Z" />
+</vector>

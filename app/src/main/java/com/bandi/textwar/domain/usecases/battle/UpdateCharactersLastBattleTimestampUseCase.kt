@@ -12,6 +12,7 @@ class UpdateCharactersLastBattleTimestampUseCase @Inject constructor(
     suspend operator fun invoke(character1Id: String, character2Id: String) {
         // 각 캐릭터의 마지막 전투 시간을 업데이트
         characterRepository.updateCharacterLastBattleTimestamp(character1Id)
+
         characterRepository.updateCharacterLastBattleTimestamp(character2Id)
     }
 }

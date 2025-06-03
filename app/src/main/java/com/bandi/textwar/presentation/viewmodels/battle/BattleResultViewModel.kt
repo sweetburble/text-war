@@ -3,7 +3,7 @@ package com.bandi.textwar.presentation.viewmodels.battle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bandi.textwar.domain.usecases.battle.ProcessBattleResultUseCase
+import com.bandi.textwar.domain.usecases.battle.ProcessBattleUseCase
 import com.bandi.textwar.data.remote.OpenAIService.BattleResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ sealed interface BattleResultUiState {
 
 @HiltViewModel
 class BattleResultViewModel @Inject constructor(
-    private val processBattleResultUseCase: ProcessBattleResultUseCase,
+    private val processBattleUseCase: ProcessBattleUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -41,7 +41,7 @@ class BattleResultViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = BattleResultUiState.Loading
             try {
-                processBattleResultUseCase(myCharId, oppId).collect { (battleResult, myCharacterName) ->
+                processBattleUseCase(myCharId, oppId).collect { (battleResult, myCharacterName) ->
                     _uiState.value = BattleResultUiState.Success(battleResult, myCharacterName)
                 }
             } catch (e: Exception) {
