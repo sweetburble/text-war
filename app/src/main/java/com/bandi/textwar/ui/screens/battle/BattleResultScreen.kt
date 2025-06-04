@@ -1,6 +1,8 @@
 package com.bandi.textwar.ui.screens.battle
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -77,7 +80,16 @@ fun BattleResultScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // 전투 이미지 표시
-                    if (!state.result.imageUrl.isNullOrEmpty()) {
+                    if (state.result.imageUrl.isNullOrEmpty()) {
+                        // 전투 이미지 영역(플레이스홀더 박스)
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(200.dp).border(BorderStroke(2.dp, Color.Gray)).padding(8.dp),
+                        ) {
+                            // 실제 이미지는 로딩 후 표시되지만, 여기서는 빈 박스만 보여줍니다.
+                            Text("이미지 로딩 중...", color = Color.Gray)
+                        }
+                    } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
@@ -93,8 +105,8 @@ fun BattleResultScreen(
                             modifier = Modifier.fillMaxWidth().height(400.dp), // 이미지 높이 조절
                             contentScale = ContentScale.Fit // 이미지 스케일 조절
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Text("전투 기록", style = MaterialTheme.typography.titleLarge)
                     Spacer(modifier = Modifier.height(8.dp))
@@ -148,8 +160,8 @@ fun TempBattleResultScreen() {
 
         // 전투 이미지 영역(플레이스홀더 박스)
         Box(
-            modifier = Modifier.fillMaxWidth().height(200.dp).padding(8.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(200.dp).border(BorderStroke(2.dp, Color.Gray)).padding(8.dp),
         ) {
             // 실제 이미지는 로딩 후 표시되지만, 여기서는 빈 박스만 보여줍니다.
             Text("이미지 로딩 중...", color = Color.Gray)

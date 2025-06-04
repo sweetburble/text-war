@@ -26,11 +26,14 @@ class ProcessBattleUseCase @Inject constructor(
     private val battleRecordsRepository: BattleRecordsRepository
 ) {
     /**
-     * UseCase를 실행
+     * 전투 결과 텍스트와 이미지를 분리하여 순차적으로 emit하는 UseCase
+     *
      * @param myCharacterId 내 캐릭터의 ID
      * @param opponentId 상대방 캐릭터의 ID
      * @return 전투 결과와 내 캐릭터 이름을 담은 Pair를 Flow로 반환
-     *         오류 발생 시 예외를 발생시킵니다.
+     *
+     * - 1차 emit: 텍스트만 생성된 상태(imageUrl=null)
+     * - 2차 emit: 이미지 생성 후 imageUrl 포함
      */
     operator fun invoke(myCharacterId: String, opponentId: String): Flow<Pair<OpenAIService.BattleResult, String>> = flow {
         Timber.d("ProcessBattleResultUseCase 시작: 내 캐릭터 ID=$myCharacterId, 상대 ID=$opponentId")
@@ -62,6 +65,9 @@ class ProcessBattleUseCase @Inject constructor(
             }
         Timber.i("OpenAI 전투 내용 생성 완료. 승자: ${battleResultOpenAI.winnerName}, 내용: ${battleResultOpenAI.narrative?.take(50)}...")
 
+        // 1차 emit: 텍스트만 우선 전달 (imageUrl=null)
+        emit(battleResultOpenAI.copy(imageUrl = null) to myCharacter.characterName)
+
         // 4. 전투 결과에 따라 승패 업데이트
         battleResultOpenAI.winnerName?.let {
             winnerName ->
@@ -84,22 +90,24 @@ class ProcessBattleUseCase @Inject constructor(
 
         // 5. OpenAI API로 전투 이미지 생성
         var generatedImageResultDataUri: String? = null
-//        if (!battleResultOpenAI.narrative.isNullOrBlank()) {
-//            Timber.d("OpenAI 전투 이미지 생성 요청")
-//            try {
-//                val imageGenResult = openAIService.generateBattleImage(battleResultOpenAI.narrative, battleResultOpenAI.winnerName)
-//                generatedImageResultDataUri = imageGenResult?.imageUrl
-//                if (generatedImageResultDataUri != null) {
-//                    Timber.i("OpenAI 전투 이미지 생성 완료 (데이터 URI): ${generatedImageResultDataUri.take(100)}...")
-//                } else {
-//                    Timber.w("OpenAI 전투 이미지 생성 실패 (데이터 URI 없음): ${imageGenResult?.errorMessage}")
-//                }
-//            } catch (e: Exception) {
-//                Timber.e(e, "OpenAI 전투 이미지 생성 중 예외 발생")
-//            }
-//        } else {
-//            Timber.w("전투 내용이 없어 이미지 생성을 건너뜁니다.")
-//        }
+        if (!battleResultOpenAI.narrative.isNullOrBlank()) {
+            Timber.d("OpenAI 전투 이미지 생성 요청")
+            try {
+                val imageGenResult = openAIService.generateBattleImage(battleResultOpenAI.narrative, battleResultOpenAI.winnerName)
+                generatedImageResultDataUri = imageGenResult?.imageUrl
+                if (generatedImageResultDataUri != null) {
+                    Timber.i("OpenAI 전투 이미지 생성 완료 (데이터 URI): ${generatedImageResultDataUri.take(100)}...")
+                    // [핵심] 2차 emit: 이미지까지 포함해서 전달 (imageUrl=생성된 url)
+                    emit(battleResultOpenAI.copy(imageUrl = generatedImageResultDataUri) to myCharacter.characterName)
+                } else {
+                    Timber.w("OpenAI 전투 이미지 생성 실패 (데이터 URI 없음): ${imageGenResult?.errorMessage}")
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "OpenAI 전투 이미지 생성 중 예외 발생")
+            }
+        } else {
+            Timber.w("전투 내용이 없어 이미지 생성을 건너뜁니다.")
+        }
 
         // 6. 전투 기록 저장
         Timber.d("전투 기록 저장 시작")
@@ -173,11 +181,9 @@ class ProcessBattleUseCase @Inject constructor(
             }
             .onFailure { e ->
                 Timber.e(e, "전투 기록 저장 실패")
-                // 전투 기록 저장 실패는 사용자에게 직접적인 오류로 표시하지 않을 수 있음 (백그라운드 작업)
-                // 하지만 로깅은 중요
             }
 
-        // 7. 결과 반환
+        // 7. 이미지까지 포함된 결과를 2차 emit
         if (battleResultOpenAI.winnerName != null || battleResultOpenAI.narrative != null) {
             // 승자가 있거나, 서사가 있는 경우 (즉, API 호출이 어느정도 성공한 경우)
             val finalBattleResult = OpenAIService.BattleResult(

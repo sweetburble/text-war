@@ -2,6 +2,7 @@ package com.bandi.textwar.ui.screens.battle
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -97,7 +98,9 @@ fun BattleRecordItem(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
             Text("전투 시간: ${record.createdAt.toFormattedBattleTime()}", style = MaterialTheme.typography.labelSmall)
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -106,7 +109,7 @@ fun BattleRecordItem(
             // 참가자 표시: 캐릭터 ID 대신 이름 사용
             val characterAName = record.characterAName ?: record.characterAId // 이름이 없으면 ID 표시
             val characterBName = record.characterBName ?: record.characterBId // 이름이 없으면 ID 표시
-            Text("참가자: $characterAName vs $characterBName", style = MaterialTheme.typography.titleMedium)
+            Text("$characterAName vs $characterBName", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
 
             // 승자 표시: winnerId가 null이면 "결과 없음" 표시, 아니면 해당하는 캐릭터 이름 표시
@@ -116,7 +119,7 @@ fun BattleRecordItem(
                 null -> "결과 없음"
                 else -> record.winnerName ?: record.winnerId
             }
-            Text("승자: $winnerDisplayName", style = MaterialTheme.typography.titleSmall)
+            Text("승자 : $winnerDisplayName", style = MaterialTheme.typography.titleSmall)
             Spacer(modifier = Modifier.height(12.dp))
 
             if (!record.imageUrl.isNullOrEmpty()) {
@@ -136,7 +139,7 @@ fun BattleRecordItem(
                     modifier = Modifier.fillMaxWidth().height(200.dp),
                     contentScale = ContentScale.Fit
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             Text("전투 내용:", style = MaterialTheme.typography.titleSmall)
