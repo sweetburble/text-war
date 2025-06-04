@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,7 +44,8 @@ fun BattleResultScreen(
     ) {
         when (val state = uiState) {
             is BattleResultUiState.Loading -> {
-                CircularProgressIndicator()
+                // 전투 결과 로딩 중에는 실제 데이터 없이 껍데기 UI를 보여줍니다.
+                TempBattleResultScreen()
             }
             is BattleResultUiState.Success -> {
                 val scrollState = rememberScrollState()
@@ -56,7 +56,7 @@ fun BattleResultScreen(
                 ) {
                     Text("전투 결과", style = MaterialTheme.typography.headlineMedium)
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     // 승패 결과 표시
                     val winnerName = state.result.winnerName
                     val myName = state.myCharacterName
@@ -95,7 +95,7 @@ fun BattleResultScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
-                    
+
                     Text("전투 기록", style = MaterialTheme.typography.titleLarge)
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -123,4 +123,50 @@ fun BattleResultScreen(
             }
         }
     }
-} 
+}
+
+@Composable
+fun TempBattleResultScreen() {
+    // 실제 데이터 없이, 전투 결과 화면의 전체 구조만 보여주는 껍데기 UI
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // 타이틀 영역
+        Text("전투 결과", style = MaterialTheme.typography.headlineMedium, color = Color.LightGray)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 승패 결과 텍스트(플레이스홀더)
+        Text("결과 대기 중...", style = MaterialTheme.typography.headlineSmall, color = Color.Gray)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 승자 정보(플레이스홀더)
+        Text("승자: -", style = MaterialTheme.typography.titleMedium, color = Color.LightGray)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 전투 이미지 영역(플레이스홀더 박스)
+        Box(
+            modifier = Modifier.fillMaxWidth().height(200.dp).padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // 실제 이미지는 로딩 후 표시되지만, 여기서는 빈 박스만 보여줍니다.
+            Text("이미지 로딩 중...", color = Color.Gray)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 전투 해설 텍스트 영역(플레이스홀더)
+        Text(
+            text = "전투 해설을 불러오는 중입니다...",
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.LightGray
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 버튼 영역(비활성화된 상태로 표시)
+        Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth(0.7f)) {
+            Text("메인으로", color = Color.Gray)
+        }
+    }
+}
