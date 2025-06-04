@@ -108,7 +108,7 @@ class ProcessBattleUseCase @Inject constructor(
             characterBId = opponentCharacter.id,
             winnerId = battleResultOpenAI.winnerName?.let { wn ->
                 if (wn == myCharacter.characterName) myCharacter.id
-                else if (wn == opponentCharacter.id) opponentCharacter.id
+                else if (wn == opponentCharacter.characterName) opponentCharacter.id
                 else null
             },
             narrative = battleResultOpenAI.narrative,

@@ -40,13 +40,7 @@ fun LeaderboardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("리더보드") }
-            )
-        }
-    ) { paddingValues ->
+    Scaffold() { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -92,11 +86,11 @@ fun LeaderboardList(leaderboardItems: List<LeaderboardItem>) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("순위", modifier = Modifier.weight(0.8f), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Text("닉네임", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text("유저", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Text("캐릭터", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Text("승리", modifier = Modifier.weight(0.8f), fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.End)
                 Text("패배", modifier = Modifier.weight(0.8f), fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.End)
-                Text("점수", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.End)
+                Text("레이팅", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.End)
             }
             HorizontalDivider(thickness = 2.dp)
         }

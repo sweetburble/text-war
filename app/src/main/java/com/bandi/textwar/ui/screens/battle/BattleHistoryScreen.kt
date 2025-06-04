@@ -25,6 +25,7 @@ import com.bandi.textwar.presentation.viewmodels.battle.BattleHistoryUiState
 import com.bandi.textwar.presentation.viewmodels.battle.BattleHistoryViewModel
 import com.bandi.textwar.R
 import com.bandi.textwar.ui.utils.toFormattedBattleTime
+import timber.log.Timber
 
 @Composable
 fun BattleHistoryScreen(
@@ -100,15 +101,22 @@ fun BattleRecordItem(
             Text("전투 시간: ${record.createdAt.toFormattedBattleTime()}", style = MaterialTheme.typography.labelSmall)
             Spacer(modifier = Modifier.height(8.dp))
 
+            Timber.d("현재 record: $record")
+
             // 참가자 표시: 캐릭터 ID 대신 이름 사용
             val characterAName = record.characterAName ?: record.characterAId // 이름이 없으면 ID 표시
             val characterBName = record.characterBName ?: record.characterBId // 이름이 없으면 ID 표시
             Text("참가자: $characterAName vs $characterBName", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
 
-            // 승자 표시: 캐릭터 ID 대신 이름 사용
-            val winnerDisplayName = record.winnerName ?: record.winnerId // 이름이 없으면 ID 표시, 둘 다 없으면 "-"
-            Text("승자: ${winnerDisplayName ?: "-"}", style = MaterialTheme.typography.titleSmall)
+            // 승자 표시: winnerId가 null이면 "결과 없음" 표시, 아니면 해당하는 캐릭터 이름 표시
+            val winnerDisplayName = when (record.winnerId) {
+                record.characterAId -> record.characterAName ?: record.characterAId
+                record.characterBId -> record.characterBName ?: record.characterBId
+                null -> "결과 없음"
+                else -> record.winnerName ?: record.winnerId
+            }
+            Text("승자: $winnerDisplayName", style = MaterialTheme.typography.titleSmall)
             Spacer(modifier = Modifier.height(12.dp))
 
             if (!record.imageUrl.isNullOrEmpty()) {
