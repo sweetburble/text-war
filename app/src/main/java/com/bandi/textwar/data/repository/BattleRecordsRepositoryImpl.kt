@@ -3,7 +3,7 @@ package com.bandi.textwar.data.repository
 import com.bandi.textwar.data.datasource.BattleRecordsRemoteDataSource
 import com.bandi.textwar.data.models.BattleRecordInput
 import com.bandi.textwar.data.models.BattleRecordSupabase
-import com.bandi.textwar.domain.models.BattleRecord // Domain Model
+import com.bandi.textwar.domain.models.BattleRecord
 import com.bandi.textwar.domain.repository.BattleRecordsRepository
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ class BattleRecordsRepositoryImpl @Inject constructor(
 
 
 // Mapper function (BattleRecordSupabase -> BattleRecord)
-// 이 함수는 BattleRecordSupabase 모델 내에 정의하거나, 별도의 Mapper 클래스/파일에 정의할 수 있습니다.
+// 이 함수는 BattleRecordSupabase 모델 내에 정의하거나, 별도의 Mapper 클래스/파일에 정의할 수 있다.
 // 여기서는 편의상 확장 함수로 바로 작성합니다.
 fun BattleRecordSupabase.toDomainModel(): BattleRecord {
     return BattleRecord(
@@ -44,7 +44,7 @@ fun BattleRecordSupabase.toDomainModel(): BattleRecord {
         winnerId = this.winnerId,
         narrative = this.narrative,
         imageUrl = this.imageUrl,
-        createdAt = this.createdAt, // 날짜/시간 타입 변환이 필요할 수 있음 (String -> Date, ZonedDateTime 등)
+        createdAt = this.createdAt, // 날짜 or 시간 타입 변환을 정의했다
         characterAName = this.characterAName,
         characterBName = this.characterBName,
         winnerName = this.winnerName

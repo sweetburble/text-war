@@ -39,11 +39,11 @@ import com.bandi.textwar.ui.navigation.CharacterDetailNav
 import com.bandi.textwar.ui.navigation.CreateCharacterNav
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
+import com.bandi.textwar.domain.usecases.battle.CheckBattleCooldownUseCase
 
 @Composable
 fun CharacterListScreen(
@@ -105,36 +105,48 @@ fun CharacterListScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
-                        items(characters) { character ->
-                            // 각 캐릭터 아이템에 대해 쿨다운 정보 가져오기
-                            val currentCooldownInfo = characterCooldowns[character.id]
-                            var remainingTime by remember(character.id, currentCooldownInfo?.second) { mutableLongStateOf(currentCooldownInfo?.second ?: 0L) }
-                            var isInCooldown by remember(character.id, currentCooldownInfo?.first) { mutableStateOf(currentCooldownInfo?.first == true) }
+                        items(characters, key = { it.id }) { character -> // key 추가 권장
+                            val cooldownInfoFromViewModel = characterCooldowns[character.id] // Pair<Boolean, Long?>
 
-                            // LaunchedEffect의 key에 character.id와 currentCooldownInfo의 내부 값들을 직접 사용하여
-                            // 아이템이 재사용되거나 ViewModel의 정보가 변경될 때마다 Effect가 올바르게 재시작되도록 함
-                            LaunchedEffect(key1 = character.id, key2 = currentCooldownInfo?.first, key3 = currentCooldownInfo?.second) {
-                                isInCooldown = currentCooldownInfo?.first == true
-                                remainingTime = currentCooldownInfo?.second ?: 0L
-                                if (isInCooldown && remainingTime > 0) {
-                                    launch {
-                                        while (isActive && remainingTime > 0) {
-                                            delay(1000L)
-                                            remainingTime = (remainingTime - 1).coerceAtLeast(0L)
-                                            if (remainingTime == 0L) {
-                                                isInCooldown = false
-                                            }
-                                        }
+                            // 화면에 표시될 남은 시간(초)과 쿨다운 상태
+                            var displayRemainingTimeSec by remember { mutableLongStateOf(0L) }
+                            var displayIsInCooldown by remember { mutableStateOf(false) }
+
+                            LaunchedEffect(key1 = cooldownInfoFromViewModel) { // ViewModel의 정보가 바뀔 때마다 재계산
+                                val lastBattleTimestampMillis = cooldownInfoFromViewModel?.second
+                                if (lastBattleTimestampMillis != null) {
+                                    val cooldownEndTimeMillis = lastBattleTimestampMillis + (CheckBattleCooldownUseCase.COOLDOWN_SECONDS * 1000L)
+
+                                    // 현재 시간 기준으로 남은 시간 계산 및 상태 업데이트 (1초마다)
+                                    while (isActive) { // CoroutineScope가 살아있는 동안 반복
+                                        val currentTimeMillis = System.currentTimeMillis()
+                                        val remainingMillis = (cooldownEndTimeMillis - currentTimeMillis).coerceAtLeast(0L)
+                                        displayRemainingTimeSec = remainingMillis / 1000L
+                                        displayIsInCooldown = remainingMillis > 0L
+
+                                        if (!displayIsInCooldown) break // 쿨다운 종료 시 루프 탈출
+                                        delay(1000L) // 1초 대기
                                     }
+                                } else { // 쿨다운 정보가 없으면 (예: 아직 전투 안 함)
+                                    displayIsInCooldown = false
+                                    displayRemainingTimeSec = 0L
                                 }
                             }
 
                             CharacterItem(
                                 character = character,
-                                characterCooldown = Pair(isInCooldown, remainingTime),
+                                // 화면 표시용 상태 전달
+                                characterCooldownDisplay = Pair(displayIsInCooldown, displayRemainingTimeSec),
                                 onBattleClick = {
-                                    if (!isInCooldown) { // UI 단에서 한번 더 체크
+                                    // 버튼 클릭 시에는 ViewModel의 findOpponent를 호출하여
+                                    // ViewModel이 최신 DB 상태를 기준으로 쿨다운을 다시 한번 확인하도록 함
+                                    if (!displayIsInCooldown) { // UI 상 즉각적인 피드백 (선택적)
                                         viewModel.findOpponent(character.id)
+                                    } else {
+                                        // 이미 쿨다운 중임을 알리는 Toast 등을 보여줄 수 있음
+                                        // 혹은 그냥 viewModel.findOpponent(character.id)를 호출하여
+                                        // ViewModel에서 에러 메시지를 띄우도록 해도 됨
+                                        viewModel.findOpponent(character.id) // ViewModel에서 처리하도록 넘김
                                     }
                                 },
                                 onDetailClick = {
@@ -185,8 +197,8 @@ fun CharacterListScreen(
 
 @Composable
 fun CharacterItem(
-    character: CharacterSummary, 
-    characterCooldown: Pair<Boolean, Long>?, // 해당 캐릭터의 쿨다운 정보 (쿨다운 중인가, 남은 시간)
+    character: CharacterSummary,
+    characterCooldownDisplay: Pair<Boolean, Long>, // 해당 캐릭터의 쿨다운 정보 (쿨다운 중인가, 남은 시간)
     onBattleClick: (myCharacterId: String) -> Unit,
     onDetailClick: () -> Unit
 ) {
@@ -207,21 +219,21 @@ fun CharacterItem(
                 horizontalArrangement = Arrangement.End // 버튼들을 오른쪽으로 정렬
             ) {
                 Button(onClick = onDetailClick) {
-                    Text("상세보기", fontWeight = FontWeight.Thin)
+                    Text("상세보기", style = MaterialTheme.typography.labelLarge) // 스타일 적용 권장
                 }
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
-                val isInCooldown = characterCooldown?.first == true
-                val remainingCooldownTime = characterCooldown?.second ?: 0L
+                val isInCooldown = characterCooldownDisplay.first
+                val remainingCooldownTime = characterCooldownDisplay.second
 
                 Button(
                     onClick = { onBattleClick(character.id) },
-                    enabled = !isInCooldown // 쿨다운 중이 아닐 때만 활성화
+                    enabled = !isInCooldown // UI 상에서 즉시 비활성화 (ViewModel에서도 재확인)
                 ) {
                     if (isInCooldown && remainingCooldownTime > 0L) {
-                        Text("대기 (${remainingCooldownTime}초)")
+                        Text("대기 (${remainingCooldownTime}초)", style = MaterialTheme.typography.labelLarge) // 스타일 적용 권장
                     } else {
-                        Text("배틀 시작")
+                        Text("배틀 시작", style = MaterialTheme.typography.labelLarge) // 스타일 적용 권장
                     }
                 }
             }

@@ -12,7 +12,7 @@ class CreateCharacterUseCase @Inject constructor(
     private val characterRepository: CharacterRepository
 ) {
     suspend operator fun invoke(characterName: String, description: String): Flow<CharacterInsert> {
-        // 여기서 추가적인 비즈니스 로직(예: 이름/설명 유효성 검사 심화)을 수행할 수 있습니다.
+        // 여기서 추가적인 비즈니스 로직(예: 이름/설명 유효성 검사 심화)을 수행할 수 있다.
         // 현재는 Repository에 그대로 위임합니다.
         return characterRepository.createCharacter(characterName, description)
     }

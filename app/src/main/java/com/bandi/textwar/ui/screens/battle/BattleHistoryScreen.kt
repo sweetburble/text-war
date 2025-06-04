@@ -129,22 +129,22 @@ fun BattleRecordItem(
                     contentScale = ContentScale.Fit
                 )
                 Spacer(modifier = Modifier.height(12.dp))
+            }
 
-                Text("전투 내용:", style = MaterialTheme.typography.titleSmall)
-                Text(
-                    record.narrative ?: "내용 없음",
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 3
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+            Text("전투 내용:", style = MaterialTheme.typography.titleSmall)
+            Text(
+                record.narrative ?: "내용 없음",
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 3
+            )
+            Spacer(modifier = Modifier.height(8.dp))
 
-                TextButton(
-                    onClick = {
-                        navController.navigate("battle_detail/${record.id}") // 주석 해제 및 실제 네비게이션 호출
-                    },
-                ) {
-                    Text("더 보기")
-                }
+            TextButton(
+                onClick = {
+                    navController.navigate("battle_detail/${record.id}") // 주석 해제 및 실제 네비게이션 호출
+                },
+            ) {
+                Text("더 보기")
             }
         }
     }

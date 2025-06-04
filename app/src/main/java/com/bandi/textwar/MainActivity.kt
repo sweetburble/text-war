@@ -109,9 +109,9 @@ fun AppNavigation(authViewModel: AuthViewModel) {
     }
 
     if (loginState == LoginState.Unknown && navController.currentDestination?.route != NavigationRouteName.LOADING_SCREEN) {
-        // 이 로직은 startDestination과 LaunchedEffect의 타이밍 이슈를 해결하기 위해 추가될 수 있습니다.
+        // 이 로직은 startDestination과 LaunchedEffect의 타이밍 이슈를 해결하기 위해 추가될 수 있다.
         // LaunchedEffect보다 먼저 실행되어야 로딩화면이 먼저 보입니다.
-        // 하지만 현재 구조에서는 startDestination을 AUTH_GRAPH로 두고 LaunchedEffect로 처리하는 것이 더 깔끔할 수 있습니다.
+        // 하지만 현재 구조에서는 startDestination을 AUTH_GRAPH로 두고 LaunchedEffect로 처리하는 것이 더 깔끔할 수 있다.
         // navController.navigate(NavigationRouteName.LOADING_SCREEN) { popUpTo(0){ inclusive = true }} // 주석 처리
     }
 }

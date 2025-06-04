@@ -84,7 +84,7 @@ class OpenAIService {
 
     /**
      * 초기화된 OpenAI 인스턴스를 반환합니다.
-     * 클라이언트가 성공적으로 초기화되지 않은 경우 null을 반환할 수 있습니다.
+     * 클라이언트가 성공적으로 초기화되지 않은 경우 null을 반환할 수 있다.
      * @return OpenAI 인스턴스 또는 null
      */
     fun getClient(): OpenAI? {
@@ -191,7 +191,7 @@ class OpenAIService {
             val actualWinnerName = winnerNameString.lineSequence().firstOrNull()?.trim().takeIf { !it.isNullOrEmpty() } ?: winnerNameString.trim()
 
             if (actualWinnerName.isEmpty()) {
-                Timber.w("승자 이름이 비어있습니다. (파싱 후)")
+                Timber.w("승자 이름이 비어있다. (파싱 후)")
                 return BattleResult(narrative = narrative, winnerName = null, imageUrl = null)
             }
 

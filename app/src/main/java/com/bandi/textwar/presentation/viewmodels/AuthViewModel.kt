@@ -66,7 +66,7 @@ class AuthViewModel @Inject constructor(
     // 현재 사용자 세션 확인 함수
     private fun checkCurrentUserSession() {
         viewModelScope.launch {
-             // 세션 상태 변경을 지속적으로 감지하려면 sessionStatus Flow를 collect 할 수 있습니다.
+             // 세션 상태 변경을 지속적으로 감지하려면 sessionStatus Flow를 collect 할 수 있다.
              supabaseClient.auth.sessionStatus.collect { status ->
                  when(status) {
                      is SessionStatus.Authenticated -> _loginState.value = LoginState.LoggedIn

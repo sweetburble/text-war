@@ -13,9 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -53,9 +55,9 @@ class CharacterListViewModel @Inject constructor(
     private val _myCharacterIdForBattle = MutableStateFlow<String?>(null)
     val myCharacterIdForBattle: StateFlow<String?> = _myCharacterIdForBattle.asStateFlow()
 
-    // 캐릭터별 쿨다운 상태 (캐릭터 ID -> Pair(쿨다운 중인가, 남은 시간(초)))
-    private val _characterCooldowns = MutableStateFlow<Map<String, Pair<Boolean, Long>>>(emptyMap())
-    val characterCooldowns: StateFlow<Map<String, Pair<Boolean, Long>>> = _characterCooldowns.asStateFlow()
+    // 캐릭터별 쿨다운 상태 (캐릭터 ID -> Pair(쿨다운 중인가, 마지막 전투 시각 Unix timestamp (밀리초) 또는 null))
+    private val _characterCooldowns = MutableStateFlow<Map<String, Pair<Boolean, Long?>>>(emptyMap())
+    val characterCooldowns: StateFlow<Map<String, Pair<Boolean, Long?>>> = _characterCooldowns.asStateFlow()
 
     init {
         loadCharacters()
@@ -83,15 +85,15 @@ class CharacterListViewModel @Inject constructor(
 
     /**
      * 특정 캐릭터의 쿨다운 정보를 로드하여 _characterCooldowns 상태를 업데이트합니다.
+     * @param updateUiImmediately UI에 즉시 반영할지 여부 (findOpponent 시에는 true)
      */
-    fun loadCharacterCooldown(characterId: String) {
+    fun loadCharacterCooldown(characterId: String, updateUiImmediately: Boolean = true) {
         viewModelScope.launch {
             checkBattleCooldownUseCase(characterId)
                 .catch { e ->
-                    // 오류 발생 시 해당 캐릭터 쿨다운 정보는 업데이트하지 않거나 기본값으로 설정
-                    // _error.value = "쿨다운 정보 로드 실패: ${e.message}" // 개별 에러보다는 전체적인 에러로 처리
+                    Timber.e(e, "Error loading cooldown for $characterId")
                 }
-                .collect { cooldownStatus ->
+                .collect { cooldownStatus -> // Pair<Boolean, Long?>
                     _characterCooldowns.value = _characterCooldowns.value.toMutableMap().apply {
                         this[characterId] = cooldownStatus
                     }
@@ -105,42 +107,57 @@ class CharacterListViewModel @Inject constructor(
      */
     fun findOpponent(myCharacterId: String) {
         viewModelScope.launch {
-            _error.value = null // 이전 오류 초기화
-            // 먼저 선택한 캐릭터의 쿨다운 확인
-            checkBattleCooldownUseCase(myCharacterId)
-                .onEach { (isInCooldown, remainingTime) ->
-                    if (isInCooldown) {
-                        _error.value = "현재 쿨다운 중입니다. ${remainingTime}초 남음"
-                        // _isFindingOpponent.value = false // 로딩 상태를 변경할 필요 없음
-                        return@onEach // 쿨다운 중이면 더 이상 진행하지 않음
+            _error.value = null
+            _isFindingOpponent.value = true // 먼저 로딩 상태 시작
+            _myCharacterIdForBattle.value = myCharacterId
+            _opponentCharacter.value = null
+
+            // DB에서 최신 쿨다운 정보 확인
+            val cooldownCheckResult = checkBattleCooldownUseCase(myCharacterId).firstOrNull() // Flow에서 첫번째 값만 가져옴
+
+            if (cooldownCheckResult == null) { // 오류 등으로 정보 못 가져옴
+                _error.value = "쿨다운 정보를 확인하지 못했습니다."
+                _isFindingOpponent.value = false
+                _myCharacterIdForBattle.value = null
+                return@launch
+            }
+
+            val (isInCooldownDb, lastBattleTimestampMillisDb) = cooldownCheckResult
+
+            if (isInCooldownDb && lastBattleTimestampMillisDb != null) {
+                val currentTimeMillis = System.currentTimeMillis()
+                val remainingTime = ((lastBattleTimestampMillisDb + (CheckBattleCooldownUseCase.COOLDOWN_SECONDS * 1000L)) - currentTimeMillis) / 1000
+                _error.value = "현재 쿨다운 중입니다. ${remainingTime.coerceAtLeast(0L)}초 남음"
+                _isFindingOpponent.value = false
+                _myCharacterIdForBattle.value = null
+                // ViewModel의 _characterCooldowns도 최신 DB 정보로 업데이트
+                _characterCooldowns.value = _characterCooldowns.value.toMutableMap().apply {
+                    this[myCharacterId] = Pair(true, lastBattleTimestampMillisDb)
+                }
+                return@launch
+            }
+
+            // 쿨다운 아니면 상대 찾기
+            getRandomOpponentUseCase()
+                .onSuccess { opponent ->
+                    _opponentCharacter.value = opponent
+                    // 전투 시작 성공 시, 두 캐릭터의 마지막 전투 시간 DB에 업데이트
+                    updateCharactersLastBattleTimestampUseCase(myCharacterId, opponent.id)
+
+                    // ViewModel의 쿨다운 상태도 즉시 업데이트 (낙관적 업데이트)
+                    val nowMillis = System.currentTimeMillis()
+                    _characterCooldowns.value = _characterCooldowns.value.toMutableMap().apply {
+                        this[myCharacterId] = Pair(true, nowMillis) // 내가 방금 전투 했으니, 현재 시간을 마지막 전투 시간으로 설정
+                        // 상대방은 DB 업데이트 후 loadCharacterCooldown으로 갱신될 것임 (선택사항)
                     }
-
-                    // 쿨다운이 아니면 상대 찾기 진행
-                    _myCharacterIdForBattle.value = myCharacterId // 나의 ID 저장
-                    _isFindingOpponent.value = true
-                    _opponentCharacter.value = null // 이전 상대 정보 초기화
-
-                    getRandomOpponentUseCase()
-                        .onSuccess { opponent ->
-                            _opponentCharacter.value = opponent // 상대 정보 업데이트
-                            // 전투 시작 성공 시, 두 캐릭터의 마지막 전투 시간 업데이트
-                            updateCharactersLastBattleTimestampUseCase(myCharacterId, opponent.id)
-                            // 상대방 캐릭터의 쿨다운 정보도 업데이트 (UI 표시용)
-                            loadCharacterCooldown(opponent.id)
-                            // 나의 캐릭터 쿨다운 정보도 전투 시작 직후이므로 다시 로드
-                            loadCharacterCooldown(myCharacterId)
-                        }
-                        .onFailure { e ->
-                            _error.value = "상대 찾기 실패: ${e.message}"
-                            _myCharacterIdForBattle.value = null // 실패 시 나의 ID도 초기화
-                        }
-                    _isFindingOpponent.value = false
+                    // 상대방 캐릭터의 쿨다운 정보도 최신화 (UI 표시용)
+                    loadCharacterCooldown(opponent.id)
                 }
-                .catch { e ->
-                    _error.value = "쿨다운 확인 중 오류: ${e.message}"
-                    _isFindingOpponent.value = false
+                .onFailure { e ->
+                    _error.value = "상대 찾기 실패: ${e.message}"
+                    _myCharacterIdForBattle.value = null
                 }
-                .launchIn(viewModelScope)
+            _isFindingOpponent.value = false
         }
     }
 
