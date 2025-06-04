@@ -31,11 +31,13 @@ import androidx.navigation.NavController
 import com.bandi.textwar.data.models.CharacterDetail
 import com.bandi.textwar.presentation.viewmodels.character.CharacterDetailViewModel
 import com.bandi.textwar.presentation.viewmodels.character.CharacterDetailViewModel.DeleteResult
+import com.bandi.textwar.presentation.viewmodels.shared.SharedEventViewModel
 import com.bandi.textwar.ui.utils.toFormattedBattleTime
 
 @Composable
 fun CharacterDetailScreen(
     navController: NavController,
+    sharedEventViewModel: SharedEventViewModel,
     viewModel: CharacterDetailViewModel = hiltViewModel()
 ) {
     val characterDetail by viewModel.characterDetail.collectAsState()
@@ -47,7 +49,8 @@ fun CharacterDetailScreen(
     remember { mutableStateOf(false) }.let { showDeleteDialog ->
         // 삭제 성공 시 이전 화면으로 이동
         if (deleteResult is DeleteResult.Success) {
-            // popBackStack은 Composable에서 직접 호출해도 안전
+            // SharedEventViewModel을 통해 리더보드 새로고침 이벤트 전달
+            sharedEventViewModel.triggerRefreshLeaderboard()
             navController.popBackStack()
         }
 

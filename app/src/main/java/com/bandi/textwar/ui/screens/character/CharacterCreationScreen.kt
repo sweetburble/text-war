@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import com.bandi.textwar.presentation.viewmodels.character.CharacterCreationViewModel
 import com.bandi.textwar.presentation.viewmodels.character.SaveCharacterState
 import com.bandi.textwar.presentation.viewmodels.character.SlotCheckState
+import com.bandi.textwar.presentation.viewmodels.shared.SharedEventViewModel
 import com.bandi.textwar.ui.theme.TextWarTheme
 
 const val MAX_CHAR_DESCRIPTION_LENGTH = 100
@@ -38,6 +39,7 @@ const val MAX_CHAR_DESCRIPTION_LENGTH = 100
 @Composable
 fun CharacterCreationScreen(
     navController: NavController,
+    sharedEventViewModel: SharedEventViewModel,
     viewModel: CharacterCreationViewModel = hiltViewModel(),
     onSaveSuccessNavigation: () -> Unit
 ) {
@@ -54,6 +56,8 @@ fun CharacterCreationScreen(
         when (val state = saveCharacterState) {
             is SaveCharacterState.Success -> {
                 snackbarHostState.showSnackbar(message = state.message)
+                // SharedEventViewModel을 통해 리더보드 새로고침 이벤트 전달
+                sharedEventViewModel.triggerRefreshLeaderboard()
                 onSaveSuccessNavigation()
             }
             is SaveCharacterState.Error -> {
@@ -148,11 +152,3 @@ fun CharacterCreationScreen(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun CharacterCreationScreenPreview() {
-    TextWarTheme {
-        CharacterCreationScreen(navController = NavController(LocalContext.current), onSaveSuccessNavigation = {})
-    }
-} 

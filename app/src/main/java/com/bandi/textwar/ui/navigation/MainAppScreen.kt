@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.bandi.textwar.ui.navigation
 
 import androidx.compose.foundation.layout.padding
@@ -15,6 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -30,13 +35,16 @@ import com.bandi.textwar.ui.screens.character.CharacterDetailScreen
 import com.bandi.textwar.ui.screens.character.CharacterListScreen
 import com.bandi.textwar.ui.screens.leaderboard.LeaderboardScreen
 import com.bandi.textwar.ui.screens.settings.SettingsScreen
+import com.bandi.textwar.presentation.viewmodels.shared.SharedEventViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainAppScreen(
     navController: NavHostController = rememberNavController(),
     onLogoutSuccess: () -> Unit // 로그아웃 성공 시 호출될 콜백
 ) {
+    // Activity 범위의 SharedEventViewModel 생성 (ViewModelStoreOwner를 명시적으로 지정)
+    val sharedEventViewModel: SharedEventViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
+
     Scaffold(
         topBar = {
             MainTopAppBar(navController = navController)
@@ -48,12 +56,12 @@ fun MainAppScreen(
         MainNavigationGraph(
             navController = navController,
             modifier = Modifier.padding(innerPadding),
-            onLogoutSuccess = onLogoutSuccess
+            onLogoutSuccess = onLogoutSuccess,
+            sharedEventViewModel = sharedEventViewModel
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopAppBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -72,7 +80,7 @@ fun MainTopAppBar(navController: NavHostController) {
             BattleResultNav.routeWithArgNames() -> BattleResultNav.title
             CharacterBattleHistoryNav.routeWithArgName() -> CharacterBattleHistoryNav.title
             BattleDetailNav.routeWithArgName() -> BattleDetailNav.title
-            else -> "TextWar"
+            else -> "Text War"
         }
     }
 
@@ -127,7 +135,8 @@ fun MainBottomNavigationBar(navController: NavHostController) {
 fun MainNavigationGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    onLogoutSuccess: () -> Unit
+    onLogoutSuccess: () -> Unit,
+    sharedEventViewModel: SharedEventViewModel
 ) {
     NavHost(
         navController = navController,
@@ -135,7 +144,7 @@ fun MainNavigationGraph(
         modifier = modifier
     ) {
         composable(BottomNavItem.CharacterList.route) {
-            CharacterListScreen(navController = navController) // onLogoutClick은 SettingsScreen에서 처리
+            CharacterListScreen(navController = navController, sharedEventViewModel = sharedEventViewModel) // onLogoutClick은 SettingsScreen에서 처리
         }
         composable(BottomNavItem.BattleHistory.route) {
             BattleHistoryScreen(navController = navController)
@@ -145,7 +154,7 @@ fun MainNavigationGraph(
             BattleHistoryScreen(navController = navController, characterId = characterId)
         }
         composable(BottomNavItem.Leaderboard.route) {
-            LeaderboardScreen(navController = navController)
+            LeaderboardScreen(navController = navController, sharedEventViewModel = sharedEventViewModel)
         }
         composable(BottomNavItem.AppSettings.route) {
             SettingsScreen(navController = navController, onLogoutClick = onLogoutSuccess)
@@ -155,6 +164,7 @@ fun MainNavigationGraph(
         composable(CreateCharacterNav.route) {
             CharacterCreationScreen(
                 navController = navController,
+                sharedEventViewModel = sharedEventViewModel,
                 onSaveSuccessNavigation = {
                     navController.popBackStack() // 저장 성공 시 이전 화면(CharacterListScreen)으로 돌아감
                 }
@@ -163,7 +173,7 @@ fun MainNavigationGraph(
 
         // 캐릭터 상세 화면
         composable(CharacterDetailNav.routeWithArgName(), arguments = CharacterDetailNav.arguments) {
-            CharacterDetailScreen(navController = navController)
+            CharacterDetailScreen(navController = navController, sharedEventViewModel = sharedEventViewModel)
         }
 
         // 전투 결과 화면

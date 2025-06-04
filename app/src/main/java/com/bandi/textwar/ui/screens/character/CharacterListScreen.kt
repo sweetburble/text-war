@@ -44,10 +44,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import com.bandi.textwar.domain.usecases.battle.CheckBattleCooldownUseCase
+import com.bandi.textwar.presentation.viewmodels.shared.SharedEventViewModel
 
 @Composable
 fun CharacterListScreen(
     navController: NavController,
+    sharedEventViewModel: SharedEventViewModel,
     viewModel: CharacterListViewModel = hiltViewModel() // ViewModel 주입
 ) {
     // 화면에 진입할 때마다 캐릭터 목록을 새로 불러옵니다 (삭제/생성/수정 반영)
@@ -82,7 +84,9 @@ fun CharacterListScreen(
     if (opponentCharacter != null && myCharacterIdForBattle != null) {
         val currentOpponent = opponentCharacter
         val currentMyCharacterId = myCharacterIdForBattle
+
         Timber.d("나의 캐릭터 ID: $currentMyCharacterId, 상대 찾음: ${currentOpponent?.characterName}, ID: ${currentOpponent?.id}. BattleResultScreen으로 이동합니다.")
+
         navController.navigate(BattleResultNav.navigateWithArgs(currentMyCharacterId!!, currentOpponent!!.id)) {
             // popUpTo("character_list") { inclusive = true }
         }
@@ -92,14 +96,9 @@ fun CharacterListScreen(
     Scaffold { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxSize().padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("캐릭터 목록", style = MaterialTheme.typography.headlineMedium)
-                Spacer(modifier = Modifier.height(16.dp))
-
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 } else if (characters.isEmpty()) {
@@ -224,7 +223,7 @@ fun CharacterItem(
                 horizontalArrangement = Arrangement.End // 버튼들을 오른쪽으로 정렬
             ) {
                 Button(onClick = onDetailClick) {
-                    Text("상세보기", style = MaterialTheme.typography.labelLarge) // 스타일 적용 권장
+                    Text("상세보기", style = MaterialTheme.typography.labelSmall)
                 }
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
@@ -236,9 +235,9 @@ fun CharacterItem(
                     enabled = !isInCooldown // UI 상에서 즉시 비활성화 (ViewModel에서도 재확인)
                 ) {
                     if (isInCooldown && remainingCooldownTime > 0L) {
-                        Text("대기 (${remainingCooldownTime}초)", style = MaterialTheme.typography.labelLarge) // 스타일 적용 권장
+                        Text("대기 (${remainingCooldownTime}초)", style = MaterialTheme.typography.labelSmall)
                     } else {
-                        Text("배틀 시작", style = MaterialTheme.typography.labelLarge) // 스타일 적용 권장
+                        Text("배틀 시작", style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }

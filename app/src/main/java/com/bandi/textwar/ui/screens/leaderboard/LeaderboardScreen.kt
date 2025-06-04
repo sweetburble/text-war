@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,19 +27,31 @@ import androidx.navigation.NavController
 import com.bandi.textwar.data.models.LeaderboardItem
 import com.bandi.textwar.presentation.viewmodels.leaderboard.LeaderboardUiState
 import com.bandi.textwar.presentation.viewmodels.leaderboard.LeaderboardViewModel
+import com.bandi.textwar.presentation.viewmodels.shared.SharedEventViewModel
+import timber.log.Timber
 
 // 순위별 색상 정의
 val goldColor = Color(0xFFFFD700)
 val silverColor = Color(0xFFC0C0C0)
 val bronzeColor = Color(0xFFCD7F32)
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardScreen(
     navController: NavController,
+    sharedEventViewModel: SharedEventViewModel,
     viewModel: LeaderboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // SharedEventViewModel의 refreshLeaderboard StateFlow를 감지하여 즉시 리더보드 갱신
+    val refreshLeaderboard by sharedEventViewModel.refreshLeaderboard.collectAsState()
+
+    LaunchedEffect(refreshLeaderboard) {
+        if (refreshLeaderboard) {
+            viewModel.fetchLeaderboardData()
+            sharedEventViewModel.consumeRefreshLeaderboard() // 사용 후 false로 전환
+        }
+    }
 
     Scaffold() { paddingValues ->
         Box(
