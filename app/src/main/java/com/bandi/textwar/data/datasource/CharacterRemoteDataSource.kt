@@ -21,11 +21,53 @@ import javax.inject.Inject
 import timber.log.Timber
 
 /**
- * Supabase를 사용하여, 캐릭터 데이터를 가져오는 Remote DataSource
+ * Supabase를 사용하여, 캐릭터 데이터를 조작하는 Remote DataSource
  */
 class CharacterRemoteDataSource @Inject constructor(
     private val supabaseClient: SupabaseClient,
 ) {
+
+    /**
+     * 캐릭터를 삭제하는 메서드
+     * @param characterId 삭제할 캐릭터의 ID(uuid)
+     * @return 성공 시 Result.success(Unit), 실패 시 Result.failure(exception)
+     *
+     * 현재 로그인된 사용자의 캐릭터만 삭제할 수 있도록 user_id 조건을 추가합니다.
+     * 캐릭터 삭제 시 battle_records에서 해당 캐릭터가 참조된 모든 row를 먼저 삭제한 후 캐릭터를 삭제합니다.
+     */
+    suspend fun deleteCharacter(characterId: String): Result<Unit> {
+        return try {
+            val currentUserId = supabaseClient.auth.currentUserOrNull()?.id
+                ?: return Result.failure(IllegalStateException("사용자가 로그인되어 있지 않습니다."))
+
+            // 1. battle_records에서 해당 캐릭터가 참조된 모든 row를 먼저 삭제
+            // character_a_id, character_b_id, winner_id 중 하나라도 일치하는 경우 모두 삭제
+            supabaseClient.postgrest.from("battle_records")
+                .delete {
+                    filter {
+                        or {
+                            eq("character_a_id", characterId)
+                            eq("character_b_id", characterId)
+                            eq("winner_id", characterId)
+                        }
+                    }
+                }
+
+            // 2. 캐릭터 삭제
+            supabaseClient.postgrest.from("characters")
+                .delete {
+                    filter {
+                        eq("id", characterId)
+                        eq("user_id", currentUserId)
+                    }
+                }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Timber.e(e, "캐릭터 삭제 중 오류 발생")
+            Result.failure(e)
+        }
+    }
+
 
     /**
      * 현재 로그인된 사용자의 캐릭터 목록을 Supabase에서 가져온다.

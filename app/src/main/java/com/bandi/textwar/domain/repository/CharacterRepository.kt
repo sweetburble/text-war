@@ -11,6 +11,13 @@ import com.bandi.textwar.data.models.LeaderboardItem
  * 캐릭터 데이터에 접근하기 위한 Repository 인터페이스
  */
 interface CharacterRepository {
+    /**
+     * 캐릭터를 삭제합니다.
+     * @param characterId 삭제할 캐릭터의 ID(uuid)
+     * @return 성공 시 Result.success(Unit), 실패 시 Result.failure(exception)
+     */
+    suspend fun deleteCharacter(characterId: String): Result<Unit>
+
 
     /**
      * 현재 로그인한 사용자의 모든 캐릭터 목록을 가져온다.

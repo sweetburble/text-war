@@ -50,6 +50,11 @@ fun CharacterListScreen(
     navController: NavController,
     viewModel: CharacterListViewModel = hiltViewModel() // ViewModel 주입
 ) {
+    // 화면에 진입할 때마다 캐릭터 목록을 새로 불러옵니다 (삭제/생성/수정 반영)
+    LaunchedEffect(Unit) {
+        viewModel.loadCharacters()
+    }
+
     val characters by viewModel.characters.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()

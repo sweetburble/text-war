@@ -24,6 +24,16 @@ class CharacterRepositoryImpl @Inject constructor(
     private val supabaseClient: SupabaseClient
 ) : CharacterRepository {
 
+    /**
+     * 캐릭터를 삭제합니다.
+     * @param characterId 삭제할 캐릭터의 ID(uuid)
+     * @return 성공 시 Result.success(Unit), 실패 시 Result.failure(exception)
+     */
+    override suspend fun deleteCharacter(characterId: String): Result<Unit> {
+        // RemoteDataSource의 deleteCharacter를 호출하여 실제 삭제를 수행합니다.
+        return remoteDataSource.deleteCharacter(characterId)
+    }
+
     override suspend fun getCurrentUserCharacters(): Flow<List<CharacterSummary>> {
         // 현재는 간단히 remoteDataSource를 직접 호출
         // 필요에 따라 여기에 캐싱 로직, 데이터 변환 로직 등을 추가할 수 있다.
