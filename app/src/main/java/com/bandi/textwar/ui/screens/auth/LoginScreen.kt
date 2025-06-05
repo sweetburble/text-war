@@ -27,12 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bandi.textwar.presentation.viewmodels.AuthViewModel
 import com.bandi.textwar.presentation.viewmodels.state.AuthUiState
+import com.bandi.textwar.ui.utils.ToastUtils
 import com.bandi.textwar.ui.utils.showSnackbar // 스낵바 유틸리티 임포트
 import timber.log.Timber
 
@@ -50,14 +52,13 @@ fun LoginScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+
     // authUiState에 따라 스낵바 표시 및 상태 초기화
     LaunchedEffect(authUiState) {
         when (val state = authUiState) {
             is AuthUiState.Success -> {
-                snackbarHostState.showSnackbar(
-                    scope = scope,
-                    message = "로그인 성공!" // 성공 메시지 (필요에 따라 ViewModel에서 전달받도록 수정 가능)
-                )
+                ToastUtils.showToast(context, "로그인 성공!")
                 authViewModel.resetAuthUiState() // 성공 후 상태 초기화
             }
             is AuthUiState.Error -> {

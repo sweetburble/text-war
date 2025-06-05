@@ -157,14 +157,12 @@ fun MainNavigationGraph(
             BattleHistoryScreen(navController = navController)
         }
         composable(CharacterBattleHistoryNav.routeWithArgName(), arguments = CharacterBattleHistoryNav.arguments) {
-            // val characterId = CharacterBattleHistoryNav.findArgument(it) // ViewModel에서 SavedStateHandle로 처리
-            BattleHistoryScreen(navController = navController /* characterId는 ViewModel에서 처리 */)
+            BattleHistoryScreen(navController = navController)
         }
         composable(BottomNavItem.Leaderboard.route) {
             LeaderboardScreen(navController = navController, sharedEventViewModel = sharedEventViewModel)
         }
         composable(BottomNavItem.AppSettings.route) {
-            // SettingsScreen에 authViewModel, onLogout, onWithdraw 콜백 전달
             SettingsScreen(
                 navController = navController,
                 authViewModel = authViewModel,

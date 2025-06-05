@@ -1,6 +1,8 @@
 package com.bandi.textwar.ui.screens.battle
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -45,10 +48,7 @@ fun BattleDetailScreen(
                 val record = state.record
                 val scrollState = rememberScrollState()
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -56,7 +56,7 @@ fun BattleDetailScreen(
                     // 참가자 정보
                     val characterAName = record.characterAName ?: record.characterAId
                     val characterBName = record.characterBName ?: record.characterBId
-                    Text("참가자: $characterAName vs $characterBName", style = MaterialTheme.typography.titleLarge)
+                    Text("참가자: $characterAName vs $characterBName", style = MaterialTheme.typography.titleLarge, fontSize = 20.sp)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // 승자 정보
@@ -64,30 +64,36 @@ fun BattleDetailScreen(
                     Text("승자: ${winnerDisplayName ?: "-"}", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 전투 이미지
-                    if (!record.imageUrl.isNullOrEmpty()) {
+                    // 전투 이미지 표시
+                    if (record.imageUrl.isNullOrEmpty()) {
+                        // 전투 이미지 영역(플레이스홀더 박스)
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(300.dp).border(BorderStroke(2.dp, Color.Gray)).padding(8.dp),
+                        ) {
+                            Text("생성된 이미지 없음", color = Color.Gray)
+                        }
+                    } else {
                         Image(
                             painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
                                     .data(data = record.imageUrl)
                                     .apply {
                                         crossfade(true)
-                                        placeholder(R.drawable.ic_placeholder_image)
-                                        error(R.drawable.ic_broken_image)
+                                        placeholder(R.drawable.ic_placeholder_image) // 플레이스홀더 이미지
+                                        error(R.drawable.ic_broken_image) // 오류 시 이미지
                                     }
                                     .build()
                             ),
                             contentDescription = "전투 장면 이미지",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp), // 이미지 크기 조절
-                            contentScale = ContentScale.Fit
+                            modifier = Modifier.fillMaxWidth().height(300.dp), // 이미지 높이 조절
+                            contentScale = ContentScale.Fit // 이미지 스케일 조절
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // 전투 내러티브
-                    Text("전투 내용", style = MaterialTheme.typography.titleMedium)
+                    Text("전투 내용", style = MaterialTheme.typography.headlineMedium)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         record.narrative ?: "전투 내용이 없습니다.",

@@ -31,17 +31,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold 
-import androidx.compose.material3.SnackbarDuration 
-import androidx.compose.material3.SnackbarHost 
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,7 +55,6 @@ import com.bandi.textwar.presentation.viewmodels.SettingsViewModel
 import com.bandi.textwar.presentation.viewmodels.state.AuthUiState
 import com.bandi.textwar.ui.components.ConfirmActionDialog
 import com.bandi.textwar.ui.utils.ToastUtils
-import kotlinx.coroutines.launch 
 
 
 /**
@@ -78,45 +74,13 @@ fun SettingsScreen(
     var showWithdrawDialog by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
-    // 로그아웃/회원탈퇴 성공 또는 실패 시 스낵바 표시 및 화면 전환
-    LaunchedEffect(authUiState) {
-        when (val state = authUiState) {
-            is AuthUiState.Success -> {
-                if (state.message.contains("로그아웃") || state.message.contains("회원탈퇴")) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = state.message,
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                    authViewModel.resetAuthUiState() // 상태 초기화
-                }
-            }
-
-            is AuthUiState.Error -> {
-                if (state.message.contains("로그아웃") || state.message.contains("회원탈퇴")) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = state.message,
-                            duration = SnackbarDuration.Short,
-                            withDismissAction = true
-                        )
-                    }
-                    authViewModel.resetAuthUiState()
-                }
-            }
-
-            else -> Unit
-        }
-    }
 
     // 로그아웃 확인 다이얼로그
     if (showLogoutDialog) {
         ConfirmActionDialog(
             onDismissRequest = { showLogoutDialog = false },
             onConfirmation = {
+                ToastUtils.showToast(context, "로그아웃 되었습니다!")
                 showLogoutDialog = false
                 authViewModel.logoutUser() // ViewModel의 로그아웃 함수 직접 호출
             },
@@ -131,6 +95,7 @@ fun SettingsScreen(
         ConfirmActionDialog(
             onDismissRequest = { showWithdrawDialog = false },
             onConfirmation = {
+                ToastUtils.showToast(context, "회원 탈퇴되었습니다. 수고하셨습니다!")
                 showWithdrawDialog = false
                 authViewModel.withdrawUser() // ViewModel 직접 호출
             },

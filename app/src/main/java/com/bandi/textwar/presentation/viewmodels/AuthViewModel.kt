@@ -161,7 +161,7 @@ class AuthViewModel @Inject constructor(
                 _password.value = ""
                 _confirmPassword.value = ""
                 _nickname.value = "" // 닉네임도 초기화
-                _authUiState.value = AuthUiState.Success("로그아웃 되었습니다.") // 성공 메시지 전달
+                _authUiState.value = AuthUiState.Idle // 메시지는 토스트로 처리
             } else {
                 // 로그아웃 실패 시에도 UI에 에러를 표시하고, 로그인 상태는 그대로 유지될 수 있음 (서버 문제 등)
                 // 또는 강제로 LoggedOut으로 변경할 수도 있으나, 여기서는 에러만 표시
@@ -184,7 +184,7 @@ class AuthViewModel @Inject constructor(
                 _password.value = ""
                 _confirmPassword.value = ""
                 _nickname.value = ""
-                _authUiState.value = AuthUiState.Success("회원탈퇴 되었습니다.")
+                _authUiState.value = AuthUiState.Idle // 메시지는 토스트로 처리
             } else {
                 _authUiState.value = AuthUiState.Error(result.exceptionOrNull()?.message ?: "회원탈퇴 중 에러가 발생했습니다.")
                 // 회원탈퇴 실패 시 로그인 상태는 유지될 수 있음
