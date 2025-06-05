@@ -17,7 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bandi.textwar.presentation.viewmodels.AuthViewModel
-import com.bandi.textwar.presentation.viewmodels.AuthUiState
+import com.bandi.textwar.presentation.viewmodels.state.AuthUiState
 import timber.log.Timber
 
 @Preview(showBackground = true)

@@ -15,8 +15,8 @@ class BattleRecordsRepositoryImpl @Inject constructor(
         return remoteDataSource.saveBattleRecord(record)
     }
 
-    override suspend fun getBattleRecords(characterId: String?, limit: Int): Result<List<BattleRecord>> {
-        return remoteDataSource.getBattleRecords(characterId, limit).map { supabaseRecords ->
+    override suspend fun getBattleRecordsForCharacter(characterId: String?, limit: Int): Result<List<BattleRecord>> {
+        return remoteDataSource.getBattleRecordsForCharacter(characterId, limit).map { supabaseRecords ->
             supabaseRecords.map { it.toDomainModel() }
         }
     }

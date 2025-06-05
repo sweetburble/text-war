@@ -3,7 +3,7 @@ package com.bandi.textwar.presentation.viewmodels.battle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bandi.textwar.domain.models.BattleRecord
-import com.bandi.textwar.domain.usecases.battle.GetBattleRecordsUseCase
+import com.bandi.textwar.domain.usecases.battle.GetBattleRecordsForCharacterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +20,7 @@ sealed interface BattleHistoryUiState {
 
 @HiltViewModel
 class BattleHistoryViewModel @Inject constructor(
-    private val getBattleRecordsUseCase: GetBattleRecordsUseCase
+    private val getBattleRecordsUseCase: GetBattleRecordsForCharacterUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<BattleHistoryUiState>(BattleHistoryUiState.Loading)

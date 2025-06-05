@@ -4,18 +4,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material3.SnackbarHostState // 스낵바 사용을 위해 추가
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember // 스낵바 상태를 위해 추가
+import androidx.compose.runtime.rememberCoroutineScope // 스낵바 스코프를 위해 추가
+import androidx.compose.ui.platform.LocalContext // 컨텍스트 사용을 위해 추가
+import androidx.navigation.NavHostController // NavHostController import
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.bandi.textwar.presentation.viewmodels.AuthViewModel
-import com.bandi.textwar.presentation.viewmodels.LoginState
+import com.bandi.textwar.presentation.viewmodels.state.AuthUiState // AuthUiState 사용
+import com.bandi.textwar.presentation.viewmodels.state.LoginState
 import com.bandi.textwar.ui.navigation.LoginNav
-import com.bandi.textwar.ui.navigation.MainAppScreen
+import com.bandi.textwar.ui.navigation.MainAppScreen // 실제 MainAppScreen 경로
 import com.bandi.textwar.ui.navigation.NavigationRouteName
 import com.bandi.textwar.ui.navigation.SignUpNav
 import com.bandi.textwar.ui.screens.LoadingScreen
@@ -23,6 +29,7 @@ import com.bandi.textwar.ui.screens.auth.LoginScreen
 import com.bandi.textwar.ui.screens.auth.SignUpScreen
 import com.bandi.textwar.ui.theme.TextWarTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -32,39 +39,86 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TextWarTheme {
-                AppNavigation(authViewModel = authViewModel)
+                val snackbarHostState = remember { SnackbarHostState() }
+                val scope = rememberCoroutineScope()
+                // LocalContext.current는 Composable 내부에서 사용해야 합니다.
+                // 여기서는 authUiState를 구독하는 LaunchedEffect 내부에서 사용하거나,
+                // 메시지 생성 시점에 context가 필요하다면 해당 Composable로 전달합니다.
+
+                val authUiState by authViewModel.authUiState.collectAsState()
+                LaunchedEffect(authUiState) {
+                    when (val state = authUiState) { // 명시적 타입 캐스팅을 위해 변수 할당
+                        is AuthUiState.Success -> {
+                            if (state.message.isNotBlank()) { // 메시지가 있을 때만 표시
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(state.message)
+                                }
+                                authViewModel.resetAuthUiState()
+                            }
+                        }
+                        is AuthUiState.Error -> {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(state.message)
+                            }
+                            authViewModel.resetAuthUiState()
+                        }
+                        else -> Unit
+                    }
+                }
+
+                AppNavigation(
+                    authViewModel = authViewModel,
+                    snackbarHostState = snackbarHostState
+                )
             }
         }
     }
 }
 
 @Composable
-fun AppNavigation(authViewModel: AuthViewModel) {
-    val navController = rememberNavController()
+fun AppNavigation(authViewModel: AuthViewModel, snackbarHostState: SnackbarHostState) {
+    val appNavController = rememberNavController() // MainActivity의 NavController
     val loginState by authViewModel.loginState.collectAsState()
 
-    LaunchedEffect(loginState, navController) {
+    LaunchedEffect(loginState, appNavController) {
         when (loginState) {
             LoginState.LoggedIn -> {
-                navController.navigate(NavigationRouteName.MAIN_GRAPH) {
-                    popUpTo(0) { inclusive = true }
+                if (appNavController.currentDestination?.route?.startsWith(NavigationRouteName.MAIN_GRAPH) == false) {
+                    appNavController.navigate(NavigationRouteName.MAIN_GRAPH) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             }
             LoginState.LoggedOut -> {
-                navController.navigate(NavigationRouteName.AUTH_GRAPH) {
-                    popUpTo(0) { inclusive = true }
+                if (appNavController.currentDestination?.route?.startsWith(NavigationRouteName.AUTH_GRAPH) == false) {
+                    appNavController.navigate(NavigationRouteName.AUTH_GRAPH) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             }
             LoginState.Unknown -> {
-                // 초기 상태 또는 상태 리셋 시 아무것도 안 함 (또는 로딩 화면으로 유지)
+                // Unknown 상태일 때, 명시적으로 로딩 화면으로 보내거나 AUTH_GRAPH로 보낼 수 있습니다.
+                // 현재 startDestination 로직과 중복될 수 있으므로 주의.
+                // 예: 초기 로딩 중이거나 아직 그래프가 결정되지 않았을 때
+                if (appNavController.currentDestination?.route != NavigationRouteName.LOADING_SCREEN &&
+                    appNavController.currentBackStack.value.size <= 1 && // 초기 상태인지 확인 (백스택이 비어있거나 하나만 있을 때)
+                    appNavController.currentDestination?.route?.startsWith(NavigationRouteName.AUTH_GRAPH) == false &&
+                    appNavController.currentDestination?.route?.startsWith(NavigationRouteName.MAIN_GRAPH) == false
+                ) {
+                    // 주석 처리: startDestination이 Unknown일 때 AUTH_GRAPH로 가므로,
+                    // checkCurrentUserSession이 완료될 때까지 AUTH_GRAPH의 LoginScreen이 보이거나,
+                    // LoginScreen에서 로딩 상태를 표시할 수 있습니다.
+                    // 또는 명시적 로딩 화면을 원한다면 아래 주석 해제
+                    // appNavController.navigate(NavigationRouteName.LOADING_SCREEN) { popUpTo(0) { inclusive = true } }
+                }
             }
         }
     }
 
     NavHost(
-        navController = navController,
+        navController = appNavController,
         startDestination = if (loginState == LoginState.LoggedIn) NavigationRouteName.MAIN_GRAPH
-                         else NavigationRouteName.AUTH_GRAPH
+        else NavigationRouteName.AUTH_GRAPH // Unknown 포함, 초기 세션 체크 전까지 AUTH_GRAPH
     ) {
         navigation(
             route = NavigationRouteName.AUTH_GRAPH,
@@ -72,19 +126,16 @@ fun AppNavigation(authViewModel: AuthViewModel) {
         ) {
             composable(LoginNav.route) {
                 LoginScreen(
-                    onNavigateToSignUp = { navController.navigate(SignUpNav.route) },
-                    onLoginSuccess = {
-                        // LoginScreen 내부의 ViewModel에서 로그인 성공 시 loginState가 LoggedIn으로 변경될 것이고,
-                        // 위의 LaunchedEffect가 네비게이션을 처리
-                        // authViewModel.checkLoginStatus() // MainActivity의 ViewModel을 통해 상태 갱신 요청
-                    }
+                    authViewModel = authViewModel,
+                    onNavigateToSignUp = { appNavController.navigate(SignUpNav.route) }
                 )
             }
             composable(SignUpNav.route) {
                 SignUpScreen(
-                    onNavigateToLogin = { navController.popBackStack() },
+                    authViewModel = authViewModel,
+                    onNavigateToLogin = { appNavController.popBackStack() },
                     onSignUpSuccess = {
-                        navController.navigate(LoginNav.route) {
+                        appNavController.navigate(LoginNav.route) {
                             popUpTo(LoginNav.route) { inclusive = true }
                         }
                     }
@@ -92,13 +143,20 @@ fun AppNavigation(authViewModel: AuthViewModel) {
             }
         }
 
-        composable(NavigationRouteName.MAIN_GRAPH) {
+        // MAIN_GRAPH를 composable로 직접 정의하고, MainAppScreen이 자체 NavHost를 갖도록 합니다.
+        composable(route = NavigationRouteName.MAIN_GRAPH) {
+            // MainAppScreen은 자체 NavController를 사용합니다.
+            // MainActivity의 appNavController는 MainAppScreen으로의 진입/이탈만 관리합니다.
             MainAppScreen(
-                onLogoutSuccess = {
-                    // MainAppScreen의 SettingsScreen에서 로그아웃 버튼 클릭 시
-                    // authViewModel.logoutUser()가 호출되어 loginState가 LoggedOut으로 변경되고,
-                    // 위의 LaunchedEffect가 AUTH_GRAPH로 네비게이션 처리
+                // MainAppScreen 내부 NavController는 MainAppScreen에서 rememberNavController()로 생성
+                // mainAppNavController = rememberNavController(), // MainAppScreen 내부에서 생성하므로 여기서 전달 안 함
+                authViewModel = authViewModel, // AuthViewModel 전달
+                snackbarHostState = snackbarHostState, // SnackbarHostState 전달
+                onLogout = { // 로그아웃 콜백 전달
                     authViewModel.logoutUser()
+                },
+                onWithdraw = { // 회원탈퇴 콜백 전달
+                    authViewModel.withdrawUser()
                 }
             )
         }
@@ -106,12 +164,5 @@ fun AppNavigation(authViewModel: AuthViewModel) {
         composable(NavigationRouteName.LOADING_SCREEN) {
             LoadingScreen()
         }
-    }
-
-    if (loginState == LoginState.Unknown && navController.currentDestination?.route != NavigationRouteName.LOADING_SCREEN) {
-        // 이 로직은 startDestination과 LaunchedEffect의 타이밍 이슈를 해결하기 위해 추가될 수 있다.
-        // LaunchedEffect보다 먼저 실행되어야 로딩화면이 먼저 보입니다.
-        // 하지만 현재 구조에서는 startDestination을 AUTH_GRAPH로 두고 LaunchedEffect로 처리하는 것이 더 깔끔할 수 있다.
-        // navController.navigate(NavigationRouteName.LOADING_SCREEN) { popUpTo(0){ inclusive = true }} // 주석 처리
     }
 }

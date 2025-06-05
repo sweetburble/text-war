@@ -11,6 +11,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -27,6 +29,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.bandi.textwar.presentation.viewmodels.AuthViewModel
+import com.bandi.textwar.presentation.viewmodels.shared.SharedEventViewModel
 import com.bandi.textwar.ui.screens.battle.BattleDetailScreen
 import com.bandi.textwar.ui.screens.battle.BattleHistoryScreen
 import com.bandi.textwar.ui.screens.battle.BattleResultScreen
@@ -35,41 +39,47 @@ import com.bandi.textwar.ui.screens.character.CharacterDetailScreen
 import com.bandi.textwar.ui.screens.character.CharacterListScreen
 import com.bandi.textwar.ui.screens.leaderboard.LeaderboardScreen
 import com.bandi.textwar.ui.screens.settings.SettingsScreen
-import com.bandi.textwar.presentation.viewmodels.shared.SharedEventViewModel
 
 @Composable
 fun MainAppScreen(
-    navController: NavHostController = rememberNavController(),
-    onLogoutSuccess: () -> Unit // 로그아웃 성공 시 호출될 콜백
+    // MainAppScreen 내부에서 사용할 NavController. MainActivity의 NavController와는 다름.
+    internalNavController: NavHostController = rememberNavController(),
+    authViewModel: AuthViewModel, // MainActivity로부터 전달받는 AuthViewModel
+    snackbarHostState: SnackbarHostState, // MainActivity로부터 전달받는 SnackbarHostState
+    onLogout: () -> Unit, // 로그아웃 콜백
+    onWithdraw: () -> Unit // 회원탈퇴 콜백
 ) {
     // Activity 범위의 SharedEventViewModel 생성 (ViewModelStoreOwner를 명시적으로 지정)
     val sharedEventViewModel: SharedEventViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
 
     Scaffold(
         topBar = {
-            MainTopAppBar(navController = navController)
+            MainTopAppBar(navController = internalNavController) // 내부 NavController 사용
         },
         bottomBar = {
-            MainBottomNavigationBar(navController = navController)
-        }
+            MainBottomNavigationBar(navController = internalNavController) // 내부 NavController 사용
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) } // 스낵바 호스트 설정
     ) { innerPadding ->
         MainNavigationGraph(
-            navController = navController,
+            navController = internalNavController, // 내부 NavController 사용
             modifier = Modifier.padding(innerPadding),
-            onLogoutSuccess = onLogoutSuccess,
+            authViewModel = authViewModel, // AuthViewModel 전달
+            onLogout = onLogout, // 로그아웃 콜백 전달
+            onWithdraw = onWithdraw, // 회원탈퇴 콜백 전달
             sharedEventViewModel = sharedEventViewModel
         )
     }
 }
 
 @Composable
-fun MainTopAppBar(navController: NavHostController) {
+fun MainTopAppBar(navController: NavHostController) { // 파라미터 타입 NavHostController로 유지
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    // 현재 라우트를 기반으로 타이틀 결정
     val currentRoute = currentDestination?.route
     val title = remember(currentRoute) {
+        // 기존 title 로직 유지
         when (currentRoute) {
             BottomNavItem.CharacterList.route -> BottomNavItem.CharacterList.title
             BottomNavItem.BattleHistory.route -> BottomNavItem.BattleHistory.title
@@ -80,13 +90,14 @@ fun MainTopAppBar(navController: NavHostController) {
             BattleResultNav.routeWithArgNames() -> BattleResultNav.title
             CharacterBattleHistoryNav.routeWithArgName() -> CharacterBattleHistoryNav.title
             BattleDetailNav.routeWithArgName() -> BattleDetailNav.title
-            else -> "Text War"
+            else -> "Text War" // 기본 타이틀
         }
     }
 
     TopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
+            // BottomNavItem에 해당하지 않는 화면이고, 이전 백스택이 있을 때만 뒤로가기 아이콘 표시
             val isTopLevelDestination = BottomNavItem.isBottomNavRoute(currentRoute)
             if (!isTopLevelDestination && navController.previousBackStackEntry != null) {
                 IconButton(onClick = { navController.navigateUp() }) {
@@ -101,7 +112,7 @@ fun MainTopAppBar(navController: NavHostController) {
 }
 
 @Composable
-fun MainBottomNavigationBar(navController: NavHostController) {
+fun MainBottomNavigationBar(navController: NavHostController) { // 파라미터 타입 NavHostController로 유지
     val items = listOf(
         BottomNavItem.CharacterList,
         BottomNavItem.BattleHistory,
@@ -133,9 +144,11 @@ fun MainBottomNavigationBar(navController: NavHostController) {
 
 @Composable
 fun MainNavigationGraph(
-    navController: NavHostController,
+    navController: NavHostController, // 내부 NavController
     modifier: Modifier = Modifier,
-    onLogoutSuccess: () -> Unit,
+    authViewModel: AuthViewModel, // AuthViewModel 추가
+    onLogout: () -> Unit, // 로그아웃 콜백 추가
+    onWithdraw: () -> Unit, // 회원탈퇴 콜백 추가
     sharedEventViewModel: SharedEventViewModel
 ) {
     NavHost(
@@ -144,47 +157,48 @@ fun MainNavigationGraph(
         modifier = modifier
     ) {
         composable(BottomNavItem.CharacterList.route) {
-            CharacterListScreen(navController = navController, sharedEventViewModel = sharedEventViewModel) // onLogoutClick은 SettingsScreen에서 처리
+            CharacterListScreen(navController = navController, sharedEventViewModel = sharedEventViewModel)
         }
         composable(BottomNavItem.BattleHistory.route) {
             BattleHistoryScreen(navController = navController)
         }
         composable(CharacterBattleHistoryNav.routeWithArgName(), arguments = CharacterBattleHistoryNav.arguments) {
-            val characterId = CharacterBattleHistoryNav.findArgument(it)
-            BattleHistoryScreen(navController = navController, characterId = characterId)
+            // val characterId = CharacterBattleHistoryNav.findArgument(it) // ViewModel에서 SavedStateHandle로 처리
+            BattleHistoryScreen(navController = navController /* characterId는 ViewModel에서 처리 */)
         }
         composable(BottomNavItem.Leaderboard.route) {
             LeaderboardScreen(navController = navController, sharedEventViewModel = sharedEventViewModel)
         }
         composable(BottomNavItem.AppSettings.route) {
-            SettingsScreen(navController = navController, onLogoutClick = onLogoutSuccess)
+            // SettingsScreen에 authViewModel, onLogout, onWithdraw 콜백 전달
+            SettingsScreen(
+                navController = navController,
+                authViewModel = authViewModel,
+                onLogout = onLogout,
+                onWithdraw = onWithdraw
+            )
         }
 
-        // 캐릭터 생성 화면
         composable(CreateCharacterNav.route) {
             CharacterCreationScreen(
                 navController = navController,
                 sharedEventViewModel = sharedEventViewModel,
                 onSaveSuccessNavigation = {
-                    navController.popBackStack() // 저장 성공 시 이전 화면(CharacterListScreen)으로 돌아감
+                    navController.popBackStack()
                 }
             )
         }
 
-        // 캐릭터 상세 화면
         composable(CharacterDetailNav.routeWithArgName(), arguments = CharacterDetailNav.arguments) {
             CharacterDetailScreen(navController = navController, sharedEventViewModel = sharedEventViewModel)
         }
 
-        // 전투 결과 화면
         composable(BattleResultNav.routeWithArgNames(), arguments = BattleResultNav.arguments) {
             BattleResultScreen(navController = navController)
         }
 
-        // 전투 상세 화면
         composable(BattleDetailNav.routeWithArgName(), arguments = BattleDetailNav.arguments) {
-            // recordId는 ViewModel에서 SavedStateHandle을 통해 자동으로 주입받으므로, 여기서 명시적으로 넘길 필요 없음
             BattleDetailScreen(navController = navController)
         }
     }
-} 
+}

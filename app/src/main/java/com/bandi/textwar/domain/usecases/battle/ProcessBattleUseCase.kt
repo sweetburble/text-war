@@ -90,24 +90,24 @@ class ProcessBattleUseCase @Inject constructor(
 
         // 5. OpenAI API로 전투 이미지 생성
         var generatedImageResultDataUri: String? = null
-        if (!battleResultOpenAI.narrative.isNullOrBlank()) {
-            Timber.d("OpenAI 전투 이미지 생성 요청")
-            try {
-                val imageGenResult = openAIService.generateBattleImage(battleResultOpenAI.narrative, battleResultOpenAI.winnerName)
-                generatedImageResultDataUri = imageGenResult?.imageUrl
-                if (generatedImageResultDataUri != null) {
-                    Timber.i("OpenAI 전투 이미지 생성 완료 (데이터 URI): ${generatedImageResultDataUri.take(100)}...")
-                    // [핵심] 2차 emit: 이미지까지 포함해서 전달 (imageUrl=생성된 url)
-                    emit(battleResultOpenAI.copy(imageUrl = generatedImageResultDataUri) to myCharacter.characterName)
-                } else {
-                    Timber.w("OpenAI 전투 이미지 생성 실패 (데이터 URI 없음): ${imageGenResult?.errorMessage}")
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "OpenAI 전투 이미지 생성 중 예외 발생")
-            }
-        } else {
-            Timber.w("전투 내용이 없어 이미지 생성을 건너뜁니다.")
-        }
+//        if (!battleResultOpenAI.narrative.isNullOrBlank()) {
+//            Timber.d("OpenAI 전투 이미지 생성 요청")
+//            try {
+//                val imageGenResult = openAIService.generateBattleImage(battleResultOpenAI.narrative, battleResultOpenAI.winnerName)
+//                generatedImageResultDataUri = imageGenResult?.imageUrl
+//                if (generatedImageResultDataUri != null) {
+//                    Timber.i("OpenAI 전투 이미지 생성 완료 (데이터 URI): ${generatedImageResultDataUri.take(100)}...")
+//                    // [핵심] 2차 emit: 이미지까지 포함해서 전달 (imageUrl=생성된 url)
+//                    emit(battleResultOpenAI.copy(imageUrl = generatedImageResultDataUri) to myCharacter.characterName)
+//                } else {
+//                    Timber.w("OpenAI 전투 이미지 생성 실패 (데이터 URI 없음): ${imageGenResult?.errorMessage}")
+//                }
+//            } catch (e: Exception) {
+//                Timber.e(e, "OpenAI 전투 이미지 생성 중 예외 발생")
+//            }
+//        } else {
+//            Timber.w("전투 내용이 없어 이미지 생성을 건너뜁니다.")
+//        }
 
         // 6. 전투 기록 저장
         Timber.d("전투 기록 저장 시작")

@@ -20,34 +20,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bandi.textwar.ui.theme.TextWarTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bandi.textwar.presentation.viewmodels.AuthViewModel
-import com.bandi.textwar.presentation.viewmodels.AuthUiState
+import com.bandi.textwar.presentation.viewmodels.state.AuthUiState
 import timber.log.Timber
-
-// LoginScreen을 위한 Preview 위젯
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    TextWarTheme {
-        LoginScreen(
-            onNavigateToSignUp = {},
-            onLoginSuccess = {}
-        )
-    }
-}
 
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel = hiltViewModel(), // ViewModel 주입
     onNavigateToSignUp: () -> Unit,
-    onLoginSuccess: () -> Unit // 로그인 성공 시 호출될 콜백
 ) {
     // ViewModel로부터 State들을 수집
     val emailValue by authViewModel.email.collectAsState()
@@ -58,7 +43,6 @@ fun LoginScreen(
     // LaunchedEffect를 사용하여 Composable의 생명주기와 관계없이 특정 상태 변화에 반응
     androidx.compose.runtime.LaunchedEffect(authUiState) {
         if (authUiState is AuthUiState.Success) {
-            onLoginSuccess()
             authViewModel.resetAuthUiState() // 성공 후 상태 초기화
         }
     }

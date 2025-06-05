@@ -2,37 +2,28 @@ package com.bandi.textwar.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bandi.textwar.domain.usecases.auth.CheckSessionUseCase
+import com.bandi.textwar.domain.usecases.auth.LoginUseCase
+import com.bandi.textwar.domain.usecases.auth.LogoutUseCase
+import com.bandi.textwar.domain.usecases.auth.SignupUseCase
+import com.bandi.textwar.domain.usecases.auth.WithdrawUseCase // 추가
+import com.bandi.textwar.presentation.viewmodels.state.AuthUiState
+import com.bandi.textwar.presentation.viewmodels.state.LoginState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import io.github.jan.supabase.SupabaseClient
+import timber.log.Timber
 import javax.inject.Inject
-import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.auth.status.SessionStatus
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
-
-// 인증 상태를 나타내는 sealed interface
-sealed interface AuthUiState {
-    object Idle : AuthUiState // 초기 상태
-    object Loading : AuthUiState // 로딩 중 상태
-    data class Success(val message: String) : AuthUiState // 성공 상태
-    data class Error(val message: String) : AuthUiState // 에러 상태
-}
-
-// 로그인 상태를 나타내는 sealed interface
-sealed interface LoginState {
-    object Unknown : LoginState      // 초기 알 수 없는 상태 또는 확인 중
-    object LoggedIn : LoginState     // 로그인 된 상태
-    object LoggedOut : LoginState    // 로그아웃 된 상태
-}
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val supabaseClient: SupabaseClient
+    private val loginUseCase: LoginUseCase,
+    private val signupUseCase: SignupUseCase,
+    private val logoutUseCase: LogoutUseCase,
+    private val checkSessionUseCase: CheckSessionUseCase,
+    private val withdrawUseCase: WithdrawUseCase // WithdrawUseCase 주입 추가
 ) : ViewModel() {
 
     // 유저 닉네임 입력을 위한 MutableStateFlow
@@ -63,17 +54,24 @@ class AuthViewModel @Inject constructor(
         checkCurrentUserSession()
     }
 
-    // 현재 사용자 세션 확인 함수
+    /**
+     * 현재 세션(로그인) 상태를 확인합니다.
+     * - SupabaseClient 직접 참조 대신 CheckSessionUseCase를 호출합니다.
+     * - 세션이 있으면 LoggedIn, 없으면 LoggedOut, 예외 시 Unknown 상태로 처리합니다.
+     */
     private fun checkCurrentUserSession() {
         viewModelScope.launch {
-             // 세션 상태 변경을 지속적으로 감지하려면 sessionStatus Flow를 collect 할 수 있다.
-             supabaseClient.auth.sessionStatus.collect { status ->
-                 when(status) {
-                     is SessionStatus.Authenticated -> _loginState.value = LoginState.LoggedIn
-                     is SessionStatus.NotAuthenticated -> _loginState.value = LoginState.LoggedOut
-                     else -> _loginState.value = LoginState.Unknown // Loading, NetworkError 등
-                 }
-             }
+            _authUiState.value = AuthUiState.Loading
+            when (checkSessionUseCase().getOrNull()) {
+                true -> _loginState.value = LoginState.LoggedIn
+                false -> _loginState.value = LoginState.LoggedOut
+                null -> _loginState.value = LoginState.Unknown // 초기 또는 에러 시 Unknown
+            }
+            // 세션 체크 후 UI 상태는 Idle로 돌려놓거나, 로그인 상태에 따라 다른 초기 UI 상태를 설정할 수 있습니다.
+            // 여기서는 Idle로 두어, 각 화면에서 필요에 따라 로딩을 다시 처리하도록 합니다.
+            if (_loginState.value != LoginState.Unknown) { // 명확한 상태가 되었을 때만 Idle로 변경
+                _authUiState.value = AuthUiState.Idle
+            }
         }
     }
 
@@ -97,32 +95,34 @@ class AuthViewModel @Inject constructor(
         _confirmPassword.value = confirmPassword
     }
 
-    // 로그인 함수
+    /**
+     * 로그인 함수 - LoginUseCase를 호출하여 인증을 처리합니다.
+     * 비동기로 실행하며, 결과에 따라 UI 상태와 로그인 상태를 갱신합니다.
+     */
     fun loginUser() {
         viewModelScope.launch {
             _authUiState.value = AuthUiState.Loading
-            try {
-                // Supabase 로그인 로직
-                supabaseClient.auth.signInWith(Email) {
-                    email = _email.value
-                    password = _password.value
-                }
+            val result = loginUseCase(_email.value, _password.value)
+            if (result.isSuccess) {
+                Timber.d("로그인에 성공하였습니다!")
                 _authUiState.value = AuthUiState.Success("로그인 성공!")
-                _loginState.value = LoginState.LoggedIn // 로그인 성공 시 상태 변경
-            } catch (e: Exception) {
-                val errorMessage = when (e.message) {
+                _loginState.value = LoginState.LoggedIn
+            } else {
+                val errorMessage = when (result.exceptionOrNull()?.message) {
                     null, "" -> "로그인 중 알 수 없는 에러가 발생했습니다."
                     "Invalid login credentials" -> "이메일 또는 비밀번호가 올바르지 않습니다."
-                    // 필요한 경우 다른 특정 에러 메시지 케이스 추가
-                    else -> e.message // 기본적으로 Supabase 메시지 사용
+                    else -> result.exceptionOrNull()?.message
                 }
-                _authUiState.value = AuthUiState.Error(errorMessage!!)
-                _loginState.value = LoginState.LoggedOut // 로그인 실패 시 상태 명시
+                _authUiState.value = AuthUiState.Error(errorMessage ?: "로그인 에러")
+                _loginState.value = LoginState.LoggedOut // 로그인 실패 시에도 LoggedOut 상태 유지
             }
         }
     }
 
-    // 회원가입 함수
+    /**
+     * 회원가입 함수 - SignupUseCase를 호출하여 인증을 처리합니다.
+     * 비밀번호 확인이 일치하지 않을 경우 에러 상태를 반환합니다.
+     */
     fun signUpUser() {
         viewModelScope.launch {
             _authUiState.value = AuthUiState.Loading
@@ -130,38 +130,64 @@ class AuthViewModel @Inject constructor(
                 _authUiState.value = AuthUiState.Error("비밀번호가 일치하지 않습니다.")
                 return@launch
             }
-            try {
-                // Supabase 회원가입 로직
-                val session = supabaseClient.auth.signUpWith(Email) {
-                    email = _email.value
-                    password = _password.value
-                    data = buildJsonObject { put("display_name", JsonPrimitive(_nickname.value)) }
-                }
+            val result = signupUseCase(_email.value, _password.value, _nickname.value)
+            if (result.isSuccess) {
                 _authUiState.value = AuthUiState.Success("회원가입 성공! 확인 이메일을 확인해주세요.")
-            } catch (e: Exception) {
-                val errorMessage = when (e.message) {
+                // 회원가입 성공 후 바로 로그인 상태로 만들지 않고, 이메일 인증 등을 기다릴 수 있으므로
+                // _loginState는 변경하지 않거나, 필요에 따라 LoggedOut 상태로 명시할 수 있습니다.
+                // 현재는 변경하지 않음.
+            } else {
+                val errorMessage = when (result.exceptionOrNull()?.message) {
                     null, "" -> "회원가입 중 알 수 없는 에러가 발생했습니다."
                     "User already registered" -> "이미 가입된 이메일입니다."
-                    else -> e.message // 기본적으로 Supabase 메시지 사용
+                    else -> result.exceptionOrNull()?.message
                 }
-                _authUiState.value = AuthUiState.Error(errorMessage!!)
+                _authUiState.value = AuthUiState.Error(errorMessage ?: "회원가입 에러")
             }
         }
     }
 
-    // 로그아웃 함수
+    /**
+     * 로그아웃 함수 - LogoutUseCase를 호출하여 인증을 처리합니다.
+     * 성공 시 상태 및 입력값 초기화, 실패 시 에러 상태로 처리합니다.
+     */
     fun logoutUser() {
         viewModelScope.launch {
-            try {
-                supabaseClient.auth.signOut()
+            _authUiState.value = AuthUiState.Loading // 로그아웃 시작 시 로딩 상태
+            val result = logoutUseCase()
+            if (result.isSuccess) {
                 _loginState.value = LoginState.LoggedOut
-                _email.value = "" // 입력 필드 초기화
+                _email.value = ""
                 _password.value = ""
                 _confirmPassword.value = ""
-                _authUiState.value = AuthUiState.Idle // UI 상태 초기화
-            } catch (e: Exception) {
-                // 로그아웃 실패 처리 (거의 발생하지 않지만)
-                _authUiState.value = AuthUiState.Error(e.message ?: "로그아웃 중 에러가 발생했습니다.")
+                _nickname.value = "" // 닉네임도 초기화
+                _authUiState.value = AuthUiState.Success("로그아웃 되었습니다.") // 성공 메시지 전달
+            } else {
+                // 로그아웃 실패 시에도 UI에 에러를 표시하고, 로그인 상태는 그대로 유지될 수 있음 (서버 문제 등)
+                // 또는 강제로 LoggedOut으로 변경할 수도 있으나, 여기서는 에러만 표시
+                _authUiState.value = AuthUiState.Error(result.exceptionOrNull()?.message ?: "로그아웃 중 에러가 발생했습니다.")
+            }
+        }
+    }
+
+    /**
+     * 회원탈퇴 함수 - WithdrawUseCase를 호출하여 처리합니다.
+     * 성공 시 상태 및 입력값 초기화, 실패 시 에러 상태로 처리합니다.
+     */
+    fun withdrawUser() {
+        viewModelScope.launch {
+            _authUiState.value = AuthUiState.Loading // 회원탈퇴 시작 시 로딩 상태
+            val result = withdrawUseCase()
+            if (result.isSuccess) {
+                _loginState.value = LoginState.LoggedOut // 회원탈퇴 성공 시 로그아웃 상태로 변경
+                _email.value = ""
+                _password.value = ""
+                _confirmPassword.value = ""
+                _nickname.value = ""
+                _authUiState.value = AuthUiState.Success("회원탈퇴 되었습니다.")
+            } else {
+                _authUiState.value = AuthUiState.Error(result.exceptionOrNull()?.message ?: "회원탈퇴 중 에러가 발생했습니다.")
+                // 회원탈퇴 실패 시 로그인 상태는 유지될 수 있음
             }
         }
     }
@@ -170,4 +196,4 @@ class AuthViewModel @Inject constructor(
     fun resetAuthUiState() {
         _authUiState.value = AuthUiState.Idle
     }
-} 
+}

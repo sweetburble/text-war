@@ -36,27 +36,27 @@ class BattleRecordsRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun getBattleRecords(characterId: String?, limit: Int): Result<List<BattleRecordSupabase>> {
+    suspend fun getBattleRecordsForCharacter(characterId: String?, limit: Int): Result<List<BattleRecordSupabase>> {
         return try {
             Timber.d("Fetching battle records. Character ID: $characterId, Limit: $limit")
 
             if (characterId != null) {
-                // 특정 캐릭터의 전투 기록: RPC 호출 (RPC 함수가 이름들을 포함하여 반환한다고 가정)
+                // 특정 캐릭터의 전투 기록: RPC 호출
                 Timber.d("Using RPC for character-specific battle records with names.")
                 val result = postgrest.rpc(
-                    function = "get_character_battle_records",
+                    function = "get_battle_records_for_character",
                     parameters = mapOf("p_character_id" to characterId, "p_limit" to limit)
                 ).decodeList<BattleRecordSupabase>()
                 Timber.i("Fetched ${result.size} battle records for character $characterId via RPC.")
                 Result.success(result)
             } else {
-                // 모든 전투 기록: select 사용 및 foreign table join
-                Timber.d("Fetching all battle records with character names using select.")
+                // 모든 전투 기록: RPC 호출
+                Timber.d("Fetching all battle records with user_id")
                 val result = postgrest.rpc(
-                    function = "get_battle_records_with_names", // 이 RPC는 characterId(nullable), limit을 받아 이름 포함 결과를 반환해야 함
-                    parameters = mapOf("p_character_id_nullable" to characterId, "p_limit_val" to limit)
+                    function = "get_my_battle_records", // 이 RPC는 limit을 받아, 내가 보유한 모든 캐릭터들의 전투 기록을 반환한다
+                    parameters = mapOf("p_limit" to limit)
                 ).decodeList<BattleRecordSupabase>()
-                Timber.i("Fetched ${result.size} battle records with names.")
+                Timber.i("Fetched ${result.size} battle records with user_id.")
                 Result.success(result)
             }
         } catch (e: Exception) {
@@ -65,6 +65,9 @@ class BattleRecordsRemoteDataSource @Inject constructor(
         }
     }
 
+    /**
+     * recordId를 받아서, 단일 전투 기록을 반환한다
+     */
     suspend fun getBattleRecord(recordId: String): Result<BattleRecordSupabase?> {
         return try {
             Timber.d("Fetching battle record with ID: $recordId including names via RPC")

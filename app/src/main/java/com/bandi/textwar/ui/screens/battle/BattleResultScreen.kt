@@ -178,7 +178,7 @@ fun TempBattleResultScreen() {
 
         // 버튼 영역(비활성화된 상태로 표시)
         Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth(0.7f)) {
-            Text("메인으로", color = Color.Gray)
+            Text("돌아가기", color = Color.Gray)
         }
     }
 }
