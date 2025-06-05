@@ -11,17 +11,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember // 스낵바 상태를 위해 추가
 import androidx.compose.runtime.rememberCoroutineScope // 스낵바 스코프를 위해 추가
-import androidx.compose.ui.platform.LocalContext // 컨텍스트 사용을 위해 추가
-import androidx.navigation.NavHostController // NavHostController import
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.bandi.textwar.presentation.viewmodels.AuthViewModel
-import com.bandi.textwar.presentation.viewmodels.state.AuthUiState // AuthUiState 사용
+import com.bandi.textwar.presentation.viewmodels.state.AuthUiState
 import com.bandi.textwar.presentation.viewmodels.state.LoginState
 import com.bandi.textwar.ui.navigation.LoginNav
-import com.bandi.textwar.ui.navigation.MainAppScreen // 실제 MainAppScreen 경로
+import com.bandi.textwar.ui.navigation.MainAppScreen
 import com.bandi.textwar.ui.navigation.NavigationRouteName
 import com.bandi.textwar.ui.navigation.SignUpNav
 import com.bandi.textwar.ui.screens.LoadingScreen
@@ -41,9 +39,6 @@ class MainActivity : ComponentActivity() {
             TextWarTheme {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val scope = rememberCoroutineScope()
-                // LocalContext.current는 Composable 내부에서 사용해야 합니다.
-                // 여기서는 authUiState를 구독하는 LaunchedEffect 내부에서 사용하거나,
-                // 메시지 생성 시점에 context가 필요하다면 해당 Composable로 전달합니다.
 
                 val authUiState by authViewModel.authUiState.collectAsState()
                 LaunchedEffect(authUiState) {
@@ -101,7 +96,6 @@ fun AppNavigation(authViewModel: AuthViewModel, snackbarHostState: SnackbarHostS
                 // 현재 startDestination 로직과 중복될 수 있으므로 주의.
                 // 예: 초기 로딩 중이거나 아직 그래프가 결정되지 않았을 때
                 if (appNavController.currentDestination?.route != NavigationRouteName.LOADING_SCREEN &&
-                    appNavController.currentBackStack.value.size <= 1 && // 초기 상태인지 확인 (백스택이 비어있거나 하나만 있을 때)
                     appNavController.currentDestination?.route?.startsWith(NavigationRouteName.AUTH_GRAPH) == false &&
                     appNavController.currentDestination?.route?.startsWith(NavigationRouteName.MAIN_GRAPH) == false
                 ) {
@@ -149,7 +143,6 @@ fun AppNavigation(authViewModel: AuthViewModel, snackbarHostState: SnackbarHostS
             // MainActivity의 appNavController는 MainAppScreen으로의 진입/이탈만 관리합니다.
             MainAppScreen(
                 // MainAppScreen 내부 NavController는 MainAppScreen에서 rememberNavController()로 생성
-                // mainAppNavController = rememberNavController(), // MainAppScreen 내부에서 생성하므로 여기서 전달 안 함
                 authViewModel = authViewModel, // AuthViewModel 전달
                 snackbarHostState = snackbarHostState, // SnackbarHostState 전달
                 onLogout = { // 로그아웃 콜백 전달
