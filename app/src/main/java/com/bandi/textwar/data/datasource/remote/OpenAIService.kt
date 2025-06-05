@@ -1,4 +1,4 @@
-package com.bandi.textwar.data.remote
+package com.bandi.textwar.data.datasource.remote
 
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
@@ -11,6 +11,7 @@ import timber.log.Timber
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.headers
@@ -49,7 +50,7 @@ class OpenAIService {
                     ignoreUnknownKeys = true
                 })
             }
-            install(io.ktor.client.plugins.HttpTimeout) {
+            install(HttpTimeout) {
                 requestTimeoutMillis = 100000
                 connectTimeoutMillis = 10000
                 socketTimeoutMillis = 70000

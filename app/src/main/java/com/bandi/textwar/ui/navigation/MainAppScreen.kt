@@ -42,20 +42,36 @@ import com.bandi.textwar.ui.screens.settings.SettingsScreen
 
 @Composable
 fun MainAppScreen(
-    // MainAppScreen 내부에서 사용할 NavController. MainActivity의 NavController와는 다름.
+    // MainAppScreen 내부에서 사용할 NavController. MainActivity의 NavController와는 다르다
     internalNavController: NavHostController = rememberNavController(),
-    authViewModel: AuthViewModel, // MainActivity로부터 전달받는 AuthViewModel
-    snackbarHostState: SnackbarHostState, // MainActivity로부터 전달받는 SnackbarHostState
+    authViewModel: AuthViewModel,
+    snackbarHostState: SnackbarHostState,
 ) {
     // Activity 범위의 SharedEventViewModel 생성 (ViewModelStoreOwner를 명시적으로 지정)
     val sharedEventViewModel: SharedEventViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
+
+    val navBackStackEntry by internalNavController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val currentRoute = currentDestination?.route
+
+    // 하단 네비게이션 바를 표시해야 하는 라우트 목록
+    val bottomBarVisibleRoutes = listOf(
+        BottomNavItem.CharacterList.route,
+        BottomNavItem.BattleHistory.route, // 인자가 없는 BattleHistoryScreen 경로
+        BottomNavItem.Leaderboard.route,
+        BottomNavItem.AppSettings.route
+    )
+
+    val shouldShowBottomBar = currentRoute in bottomBarVisibleRoutes
 
     Scaffold(
         topBar = {
             MainTopAppBar(navController = internalNavController) // 내부 NavController 사용
         },
         bottomBar = {
-            MainBottomNavigationBar(navController = internalNavController) // 내부 NavController 사용
+            if (shouldShowBottomBar) { // 조건부로 하단 네비게이션 바 표시
+                MainBottomNavigationBar(navController = internalNavController) // 내부 NavController 사용
+            }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) } // 스낵바 호스트 설정
     ) { innerPadding ->
@@ -141,7 +157,7 @@ fun MainBottomNavigationBar(navController: NavHostController) { // 파라미터 
 @Composable
 fun MainNavigationGraph(
     navController: NavHostController, // 내부 NavController
-    authViewModel: AuthViewModel, // AuthViewModel 추가
+    authViewModel: AuthViewModel,
     sharedEventViewModel: SharedEventViewModel,
     modifier: Modifier = Modifier,
 ) {

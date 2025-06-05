@@ -1,6 +1,6 @@
 package com.bandi.textwar.di
 
-import com.bandi.textwar.data.remote.OpenAIService
+import com.bandi.textwar.data.datasource.remote.OpenAIService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

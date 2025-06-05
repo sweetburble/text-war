@@ -2,7 +2,7 @@ package com.bandi.textwar.domain.usecases.battle
 
 import android.util.Base64
 import com.bandi.textwar.data.models.BattleRecordInput
-import com.bandi.textwar.data.remote.OpenAIService
+import com.bandi.textwar.data.datasource.remote.OpenAIService
 import com.bandi.textwar.domain.repository.BattleRecordsRepository
 import com.bandi.textwar.domain.repository.CharacterRepository
 import com.bandi.textwar.domain.repository.StorageRepository

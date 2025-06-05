@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bandi.textwar.domain.usecases.battle.ProcessBattleUseCase
-import com.bandi.textwar.data.remote.OpenAIService.BattleResult
+import com.bandi.textwar.data.datasource.remote.OpenAIService.BattleResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +21,7 @@ sealed interface BattleResultUiState {
 @HiltViewModel
 class BattleResultViewModel @Inject constructor(
     private val processBattleUseCase: ProcessBattleUseCase,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<BattleResultUiState>(BattleResultUiState.Loading)
