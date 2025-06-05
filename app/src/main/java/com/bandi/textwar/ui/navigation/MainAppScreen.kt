@@ -46,8 +46,6 @@ fun MainAppScreen(
     internalNavController: NavHostController = rememberNavController(),
     authViewModel: AuthViewModel, // MainActivity로부터 전달받는 AuthViewModel
     snackbarHostState: SnackbarHostState, // MainActivity로부터 전달받는 SnackbarHostState
-    onLogout: () -> Unit, // 로그아웃 콜백
-    onWithdraw: () -> Unit // 회원탈퇴 콜백
 ) {
     // Activity 범위의 SharedEventViewModel 생성 (ViewModelStoreOwner를 명시적으로 지정)
     val sharedEventViewModel: SharedEventViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
@@ -63,11 +61,9 @@ fun MainAppScreen(
     ) { innerPadding ->
         MainNavigationGraph(
             navController = internalNavController, // 내부 NavController 사용
-            modifier = Modifier.padding(innerPadding),
             authViewModel = authViewModel, // AuthViewModel 전달
-            onLogout = onLogout, // 로그아웃 콜백 전달
-            onWithdraw = onWithdraw, // 회원탈퇴 콜백 전달
-            sharedEventViewModel = sharedEventViewModel
+            sharedEventViewModel = sharedEventViewModel,
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }
@@ -145,11 +141,9 @@ fun MainBottomNavigationBar(navController: NavHostController) { // 파라미터 
 @Composable
 fun MainNavigationGraph(
     navController: NavHostController, // 내부 NavController
-    modifier: Modifier = Modifier,
     authViewModel: AuthViewModel, // AuthViewModel 추가
-    onLogout: () -> Unit, // 로그아웃 콜백 추가
-    onWithdraw: () -> Unit, // 회원탈퇴 콜백 추가
-    sharedEventViewModel: SharedEventViewModel
+    sharedEventViewModel: SharedEventViewModel,
+    modifier: Modifier = Modifier,
 ) {
     NavHost(
         navController = navController,
@@ -174,8 +168,6 @@ fun MainNavigationGraph(
             SettingsScreen(
                 navController = navController,
                 authViewModel = authViewModel,
-                onLogout = onLogout,
-                onWithdraw = onWithdraw
             )
         }
 
