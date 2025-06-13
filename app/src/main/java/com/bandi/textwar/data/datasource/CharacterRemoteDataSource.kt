@@ -32,8 +32,8 @@ class CharacterRemoteDataSource @Inject constructor(
      * @param characterId 삭제할 캐릭터의 ID(uuid)
      * @return 성공 시 Result.success(Unit), 실패 시 Result.failure(exception)
      *
-     * 현재 로그인된 사용자의 캐릭터만 삭제할 수 있도록 user_id 조건을 추가합니다.
-     * 캐릭터 삭제 시 battle_records에서 해당 캐릭터가 참조된 모든 row를 먼저 삭제한 후 캐릭터를 삭제합니다.
+     * 현재 로그인된 사용자의 캐릭터만 삭제할 수 있도록 user_id 조건을 추가
+     * 캐릭터 삭제 시 battle_records에서 해당 캐릭터가 참조된 모든 row를 먼저 삭제한 후 캐릭터를 삭제
      */
     suspend fun deleteCharacter(characterId: String): Result<Unit> {
         return try {
@@ -166,8 +166,8 @@ class CharacterRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 캐릭터의 전투 통계를 업데이트합니다. (승리 또는 패배)
-     * Supabase RPC 함수를 호출하여 원자적으로 카운트를 업데이트합니다.
+     * 캐릭터의 전투 통계를 업데이트 (승리 또는 패배)
+     * Supabase RPC 함수를 호출하여 원자적으로 카운트를 업데이트
      * @param characterId 업데이트할 캐릭터의 ID
      * @param isWin 승리했는지 여부 (true면 승리, false면 패배)
      */
@@ -183,7 +183,7 @@ class CharacterRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 특정 캐릭터의 마지막 전투 시간을 가져옵니다.
+     * 특정 캐릭터의 마지막 전투 시간을 가져온다.
      * @param characterId 확인할 캐릭터의 ID
      * @return 마지막 전투 시간 (timestamp with time zone) 또는 null (정보가 없는 경우)
      */
@@ -199,8 +199,8 @@ class CharacterRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 특정 캐릭터의 마지막 전투 시간을 현재 시간으로 업데이트합니다.
-     * Supabase RPC 함수 'update_character_last_battle_timestamp'를 호출합니다.
+     * 특정 캐릭터의 마지막 전투 시간을 현재 시간으로 업데이트
+     * Supabase RPC 함수 'update_character_last_battle_timestamp'를 호출
      * @param characterId 업데이트할 캐릭터의 ID
      */
     suspend fun updateCharacterLastBattleTimestamp(characterId: String) {
@@ -213,9 +213,9 @@ class CharacterRemoteDataSource @Inject constructor(
     }
 
     /**
-     * 모든 캐릭터 정보를 리더보드용으로 가져옵니다.
+     * 모든 캐릭터 정보를 리더보드용으로 가져온다.
      * users 테이블과 조인하여 유저 닉네임을 함께 가져오고,
-     * rating 높은 순 -> wins 높은 순 -> character_name 문자열 순으로 정렬합니다.
+     * rating 높은 순 -> wins 높은 순 -> character_name 문자열 순으로 정렬
      */
     suspend fun getLeaderboardData(): Result<List<LeaderboardItem>> {
         return try {
@@ -266,19 +266,4 @@ class CharacterRemoteDataSource @Inject constructor(
     private data class UserDto(
         val display_name: String?,
     )
-
-    suspend fun getCharactersByUserId(userId: String): Result<List<CharacterDetail>> {
-        return try {
-            val characters = supabaseClient.postgrest.from("characters")
-                .select {
-                    filter {
-                        eq("user_id", userId)
-                    }
-                }
-                .decodeList<CharacterDetail>()
-            Result.success(characters)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 }

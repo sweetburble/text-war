@@ -35,7 +35,7 @@ class BattleRecordsRepositoryImpl @Inject constructor(
 
 // Mapper function (BattleRecordSupabase -> BattleRecord)
 // 이 함수는 BattleRecordSupabase 모델 내에 정의하거나, 별도의 Mapper 클래스/파일에 정의할 수 있다.
-// 여기서는 편의상 확장 함수로 바로 작성합니다.
+// 여기서는 편의상 확장 함수로 바로 작성
 fun BattleRecordSupabase.toDomainModel(): BattleRecord {
     return BattleRecord(
         id = this.id,

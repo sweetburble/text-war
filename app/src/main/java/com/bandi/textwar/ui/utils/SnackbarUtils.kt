@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * 스낵바를 표시하는 확장 함수입니다.
+ * 스낵바를 표시하는 확장 함수
  *
  * @param message 표시할 메시지
  * @param actionLabel (선택 사항) 스낵바 액션 버튼에 표시될 텍스트

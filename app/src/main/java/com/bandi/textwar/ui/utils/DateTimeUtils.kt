@@ -20,8 +20,8 @@ fun String.toKstZonedDateTime(): ZonedDateTime? {
 }
 
 /**
- * ISO 8601 형식의 날짜/시간 문자열을 "yy-MM-dd HH:mm" 형식으로 변환합니다.
- * 파싱에 실패하면 원본 문자열을 반환합니다.
+ * ISO 8601 형식의 날짜/시간 문자열을 "yy-MM-dd HH:mm" 형식으로 변환
+ * 파싱에 실패하면 원본 문자열을 반환
  */
 fun String.toFormattedBattleTime(): String {
     return try {

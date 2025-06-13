@@ -26,11 +26,15 @@ class BattleHistoryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<BattleHistoryUiState>(BattleHistoryUiState.Loading)
     val uiState: StateFlow<BattleHistoryUiState> = _uiState.asStateFlow()
 
-    // 모든 전투 기록 로드 (초기 로드 등)
+    // 모든 전투 기록 로드 (초기 로드)
     init {
-        loadBattleHistory() // 기본적으로 모든 전투 기록을 로드
+        loadBattleHistory()
     }
 
+    /**
+     * characterId == null : 유저가 가진 모든 캐릭터의 전투 기록 로드
+     * != null : 특정 캐릭터의 전투 기록만 로드
+     */
     fun loadBattleHistory(characterId: String? = null, limit: Int = 20) {
         viewModelScope.launch {
             _uiState.value = BattleHistoryUiState.Loading
@@ -47,10 +51,5 @@ class BattleHistoryViewModel @Inject constructor(
                     _uiState.value = BattleHistoryUiState.Error(exception.localizedMessage ?: "알 수 없는 오류가 발생했습니다.")
                 }
         }
-    }
-
-    // 특정 캐릭터의 전투 기록만 로드하는 함수 (선택 사항)
-    fun loadCharacterBattleHistory(characterId: String, limit: Int = 20) {
-        loadBattleHistory(characterId = characterId, limit = limit)
     }
 }

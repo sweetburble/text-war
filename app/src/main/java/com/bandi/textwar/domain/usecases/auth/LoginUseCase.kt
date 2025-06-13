@@ -7,8 +7,8 @@ import javax.inject.Inject
 
 /**
  * 로그인 유스케이스
- * ViewModel에서 호출하여 로그인 로직을 담당합니다.
- * - 이메일, 비밀번호를 받아 AuthRepository에 위임합니다.
+ * ViewModel에서 호출하여 로그인 로직을 담당
+ * - 이메일, 비밀번호를 받아 AuthRepository에 위임
  */
 class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository, // 이름 변경 (AuthRepository)

@@ -2,8 +2,8 @@ package com.bandi.textwar.domain.repository
 
 /**
  * 인증 관련 도메인 인터페이스
- * ViewModel, UseCase에서 인증 기능을 추상화하여 사용합니다.
- * - 구현체는 data/repository/AuthRepositoryImpl에서 작성합니다.
+ * ViewModel, UseCase에서 인증 기능을 추상화하여 사용
+ * - 구현체는 data/repository/AuthRepositoryImpl에서 작성
  */
 interface AuthRepository {
     /**

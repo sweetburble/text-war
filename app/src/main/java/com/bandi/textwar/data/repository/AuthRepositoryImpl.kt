@@ -6,8 +6,8 @@ import javax.inject.Inject
 
 /**
  * 인증 도메인 인터페이스 구현체
- * 실제 인증 처리는 AuthDataSource에 위임합니다.
- * - Hilt로 주입받아 사용합니다.
+ * 실제 인증 처리는 AuthDataSource에 위임
+ * - Hilt로 주입받아 사용
  */
 class AuthRepositoryImpl @Inject constructor(
     private val dataSource: AuthDataSource

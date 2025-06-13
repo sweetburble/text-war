@@ -25,12 +25,12 @@ class CharacterRepositoryImpl @Inject constructor(
 ) : CharacterRepository {
 
     /**
-     * 캐릭터를 삭제합니다.
+     * 캐릭터를 삭제
      * @param characterId 삭제할 캐릭터의 ID(uuid)
      * @return 성공 시 Result.success(Unit), 실패 시 Result.failure(exception)
      */
     override suspend fun deleteCharacter(characterId: String): Result<Unit> {
-        // RemoteDataSource의 deleteCharacter를 호출하여 실제 삭제를 수행합니다.
+        // RemoteDataSource의 deleteCharacter를 호출하여 실제 삭제를 수행
         return remoteDataSource.deleteCharacter(characterId)
     }
 
@@ -94,15 +94,6 @@ class CharacterRepositoryImpl @Inject constructor(
 
     override suspend fun updateCharacterLastBattleTimestamp(characterId: String) {
         remoteDataSource.updateCharacterLastBattleTimestamp(characterId)
-    }
-
-    override suspend fun updateCharacter(character: CharacterDetail): Result<Unit> {
-        // TODO: remoteDataSource에 updateCharacter 구현 필요 (현재 CharacterRemoteDataSource에는 해당 함수 없음)
-        // 이 함수는 Character 객체 전체를 받아와서 업데이트하는 로직이어야 합니다.
-        // 예시: return remoteDataSource.updateCharacter(character)
-        // 현재 CharacterRemoteDataSource에는 해당 함수가 없으므로, 우선 Result.success(Unit) 반환 또는 예외 발생으로 처리합니다.
-        // 실제 구현 시 CharacterRemoteDataSource.kt 에 Character 객체를 받아 처리하는 suspend fun updateCharacter(character: Character): Result<Unit> 와 같은 함수 필요
-        return Result.success(Unit) // 임시 반환
     }
 
     override suspend fun getLeaderboardData(): Result<List<LeaderboardItem>> {

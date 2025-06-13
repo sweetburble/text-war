@@ -12,7 +12,7 @@ class DeleteCharacterUseCase @Inject constructor(
     private val repository: CharacterRepository
 ) {
     /**
-     * 캐릭터를 삭제합니다.
+     * 캐릭터를 삭제
      * @param characterId 삭제할 캐릭터의 ID(uuid)
      * @return 성공 시 Result.success(Unit), 실패 시 Result.failure(exception)
      */

@@ -113,7 +113,7 @@ object BattleResultNav : DestinationArg<Pair<String, String>> {
     private const val OPPONENT_CHARACTER_ID_ARG = "opponentId"
 
     // DestinationArg 인터페이스의 argName은 대표 인자 이름으로 사용하고,
-    // 실제 라우트 구성과 인자 추출은 내부적으로 처리합니다.
+    // 실제 라우트 구성과 인자 추출은 내부적으로 처리
     override val argName: String = MY_CHARACTER_ID_ARG
 
     override val deepLinks: List<NavDeepLink> = listOf(
@@ -187,7 +187,7 @@ object NavigationRouteName {
     const val LEADERBOARD = "leaderboard"
     const val APP_SETTINGS = "app_settings"
 
-    // Other Routes (예시: 기존 화면들)
+    // Other Routes
     const val LOGIN = "login"
     const val SIGN_UP = "sign_up"
     const val CREATE_CHARACTER = "create_character"

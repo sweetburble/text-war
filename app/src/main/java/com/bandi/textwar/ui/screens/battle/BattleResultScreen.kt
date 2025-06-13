@@ -47,7 +47,7 @@ fun BattleResultScreen(
     ) {
         when (val state = uiState) {
             is BattleResultUiState.Loading -> {
-                // 전투 결과 로딩 중에는 실제 데이터 없이 껍데기 UI를 보여줍니다.
+                // 전투 결과 로딩 중에는 실제 데이터 없이 껍데기 UI를 보여준다.
                 TempBattleResultScreen()
             }
             is BattleResultUiState.Success -> {
@@ -86,7 +86,7 @@ fun BattleResultScreen(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.size(200.dp).border(BorderStroke(2.dp, Color.Gray)).padding(8.dp),
                         ) {
-                            // 실제 이미지는 로딩 후 표시되지만, 여기서는 빈 박스만 보여줍니다.
+                            // 실제 이미지는 로딩 후 표시되지만, 여기서는 빈 박스만 보여준다.
                             Text("이미지 로딩 중...", color = Color.Gray)
                         }
                     } else {
@@ -163,14 +163,14 @@ fun TempBattleResultScreen() {
             contentAlignment = Alignment.Center,
             modifier = Modifier.size(200.dp).border(BorderStroke(2.dp, Color.Gray)).padding(8.dp),
         ) {
-            // 실제 이미지는 로딩 후 표시되지만, 여기서는 빈 박스만 보여줍니다.
+            // 실제 이미지는 로딩 후 표시되지만, 여기서는 빈 박스만 보여준다.
             Text("이미지 로딩 중...", color = Color.Gray)
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         // 전투 해설 텍스트 영역(플레이스홀더)
         Text(
-            text = "전투 해설을 불러오는 중입니다...",
+            text = "전투 해설을 불러오는 중..",
             style = MaterialTheme.typography.bodyLarge,
             color = Color.LightGray
         )

@@ -5,8 +5,8 @@ import javax.inject.Inject
 
 /**
  * 회원가입 유스케이스
- * ViewModel에서 호출하여 회원가입 로직을 담당합니다.
- * - 이메일, 비밀번호, 닉네임을 받아 AuthRepository에 위임합니다.
+ * ViewModel에서 호출하여 회원가입 로직을 담당
+ * - 이메일, 비밀번호, 닉네임을 받아 AuthRepository에 위임
  */
 class SignupUseCase @Inject constructor(
     private val repository: AuthRepository

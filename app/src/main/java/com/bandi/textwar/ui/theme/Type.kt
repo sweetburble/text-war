@@ -24,7 +24,7 @@ val PretendardVariable = FontFamily(
 
 
 // 기본 Typography 설정 (Material 3 기준)
-// 여기에 PretendardVariable 폰트 패밀리를 적용합니다.
+// 여기에 PretendardVariable 폰트 패밀리를 적용
 val AppTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = PretendardVariable,

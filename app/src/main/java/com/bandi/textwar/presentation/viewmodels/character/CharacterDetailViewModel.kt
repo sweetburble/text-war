@@ -56,7 +56,7 @@ class CharacterDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null // 상세 정보 로드 시 이전 에러 상태 초기화
-            // 상세 정보 로드 시 deleteResult 상태도 초기화할 수 있습니다.
+            // 상세 정보 로드 시 deleteResult 상태도 초기화할 수 있다.
             // _deleteResult.value = DeleteResult.None
             getCharacterDetailUseCase(id)
                 .catch { e ->
@@ -101,7 +101,7 @@ class CharacterDetailViewModel @Inject constructor(
     /**
      * 삭제 결과 상태를 초기 상태(None)로 리셋하는 함수.
      * UI에서 삭제 성공/실패 처리가 완료된 후 호출하여,
-     * 화면이 유지될 경우 의도치 않은 재처리를 방지합니다.
+     * 화면이 유지될 경우 의도치 않은 재처리를 방지
      */
     fun resetDeleteResultState() {
         _deleteResult.value = DeleteResult.None
@@ -109,10 +109,10 @@ class CharacterDetailViewModel @Inject constructor(
 
     /**
      * 화면이 사라질 때(ViewModel이 clear될 때) 호출될 수 있는 로직 (선택 사항)
-     * HiltViewModel에서는 onCleared()를 오버라이드하여 사용합니다.
+     * HiltViewModel에서는 onCleared()를 오버라이드하여 사용
      */
     override fun onCleared() {
         super.onCleared()
-        // 필요한 경우 여기서도 상태를 초기화하거나 리소스를 해제할 수 있습니다.
+        // 필요한 경우 여기서도 상태를 초기화하거나 리소스를 해제할 수 있다.
     }
 }

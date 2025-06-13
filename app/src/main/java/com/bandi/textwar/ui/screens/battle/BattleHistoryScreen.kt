@@ -152,7 +152,7 @@ fun BattleRecordItem(
 
             TextButton(
                 onClick = {
-                    navController.navigate("battle_detail/${record.id}") // 주석 해제 및 실제 네비게이션 호출
+                    navController.navigate("battle_detail/${record.id}")
                 },
             ) {
                 Text("더 보기")

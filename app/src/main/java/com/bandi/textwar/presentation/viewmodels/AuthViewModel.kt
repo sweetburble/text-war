@@ -23,7 +23,7 @@ class AuthViewModel @Inject constructor(
     private val signupUseCase: SignupUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val checkSessionUseCase: CheckSessionUseCase,
-    private val withdrawUseCase: WithdrawUseCase // WithdrawUseCase 주입 추가
+    private val withdrawUseCase: WithdrawUseCase
 ) : ViewModel() {
 
     // 유저 닉네임 입력을 위한 MutableStateFlow
@@ -55,9 +55,9 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * 현재 세션(로그인) 상태를 확인합니다.
-     * - SupabaseClient 직접 참조 대신 CheckSessionUseCase를 호출합니다.
-     * - 세션이 있으면 LoggedIn, 없으면 LoggedOut, 예외 시 Unknown 상태로 처리합니다.
+     * 현재 세션(로그인) 상태를 확인
+     * - SupabaseClient 직접 참조 대신 CheckSessionUseCase를 호출
+     * - 세션이 있으면 LoggedIn, 없으면 LoggedOut, 예외 시 Unknown 상태로 처리
      */
     private fun checkCurrentUserSession() {
         viewModelScope.launch {
@@ -67,8 +67,8 @@ class AuthViewModel @Inject constructor(
                 false -> _loginState.value = LoginState.LoggedOut
                 null -> _loginState.value = LoginState.Unknown // 초기 또는 에러 시 Unknown
             }
-            // 세션 체크 후 UI 상태는 Idle로 돌려놓거나, 로그인 상태에 따라 다른 초기 UI 상태를 설정할 수 있습니다.
-            // 여기서는 Idle로 두어, 각 화면에서 필요에 따라 로딩을 다시 처리하도록 합니다.
+            // 세션 체크 후 UI 상태는 Idle로 돌려놓거나, 로그인 상태에 따라 다른 초기 UI 상태를 설정할 수 있다.
+            // 여기서는 Idle로 두어, 각 화면에서 필요에 따라 로딩을 다시 처리하도록 한다.
             if (_loginState.value != LoginState.Unknown) { // 명확한 상태가 되었을 때만 Idle로 변경
                 _authUiState.value = AuthUiState.Idle
             }
@@ -96,8 +96,8 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * 로그인 함수 - LoginUseCase를 호출하여 인증을 처리합니다.
-     * 비동기로 실행하며, 결과에 따라 UI 상태와 로그인 상태를 갱신합니다.
+     * 로그인 함수 - LoginUseCase를 호출하여 인증을 처리
+     * 비동기로 실행하며, 결과에 따라 UI 상태와 로그인 상태를 갱신
      */
     fun loginUser() {
         viewModelScope.launch {
@@ -120,8 +120,8 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * 회원가입 함수 - SignupUseCase를 호출하여 인증을 처리합니다.
-     * 비밀번호 확인이 일치하지 않을 경우 에러 상태를 반환합니다.
+     * 회원가입 함수 - SignupUseCase를 호출하여 인증을 처리
+     * 비밀번호 확인이 일치하지 않을 경우 에러 상태를 반환
      */
     fun signUpUser() {
         viewModelScope.launch {
@@ -134,7 +134,7 @@ class AuthViewModel @Inject constructor(
             if (result.isSuccess) {
                 _authUiState.value = AuthUiState.Success("회원가입 성공! 확인 이메일을 확인해주세요.")
                 // 회원가입 성공 후 바로 로그인 상태로 만들지 않고, 이메일 인증 등을 기다릴 수 있으므로
-                // _loginState는 변경하지 않거나, 필요에 따라 LoggedOut 상태로 명시할 수 있습니다.
+                // _loginState는 변경하지 않거나, 필요에 따라 LoggedOut 상태로 명시할 수 있다.
                 // 현재는 변경하지 않음.
             } else {
                 val errorMessage = when (result.exceptionOrNull()?.message) {
@@ -148,8 +148,8 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * 로그아웃 함수 - LogoutUseCase를 호출하여 인증을 처리합니다.
-     * 성공 시 상태 및 입력값 초기화, 실패 시 에러 상태로 처리합니다.
+     * 로그아웃 함수 - LogoutUseCase를 호출하여 인증을 처리
+     * 성공 시 상태 및 입력값 초기화, 실패 시 에러 상태로 처리
      */
     fun logoutUser() {
         viewModelScope.launch {
@@ -171,8 +171,8 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * 회원탈퇴 함수 - WithdrawUseCase를 호출하여 처리합니다.
-     * 성공 시 상태 및 입력값 초기화, 실패 시 에러 상태로 처리합니다.
+     * 회원탈퇴 함수 - WithdrawUseCase를 호출하여 처리
+     * 성공 시 상태 및 입력값 초기화, 실패 시 에러 상태로 처리
      */
     fun withdrawUser() {
         viewModelScope.launch {

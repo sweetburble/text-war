@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
@@ -114,6 +116,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(paddingValues) // Scaffold의 padding 적용
                 .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState()) // 스크롤 추가
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

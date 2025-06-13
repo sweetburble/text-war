@@ -60,7 +60,7 @@ fun CharacterCreationScreen(
             is SaveCharacterState.Error -> {
                 snackbarHostState.showSnackbar(message = state.message)
             }
-            else -> { /* Idle or Loading, do nothing here for snackbar */ }
+            else -> {}
         }
     }
 

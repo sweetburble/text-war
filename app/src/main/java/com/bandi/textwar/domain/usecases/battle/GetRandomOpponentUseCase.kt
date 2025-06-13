@@ -13,7 +13,7 @@ class GetRandomOpponentUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(): Result<CharacterDetail> {
         return try {
-            // Repository를 통해 상대 캐릭터를 가져옵니다.
+            // Repository를 통해 상대 캐릭터를 가져온다.
             val opponent = characterRepository.getRandomOpponentCharacter().firstOrNull()
             if (opponent != null) {
                 Result.success(opponent)

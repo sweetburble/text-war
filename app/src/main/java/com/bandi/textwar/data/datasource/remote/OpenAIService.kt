@@ -26,14 +26,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-private const val OPENAI_CHAT_MODEL = "gpt-4.1-mini-2025-04-14"
+private const val OPENAI_CHAT_MODEL = "gpt-4o-mini-2024-07-18"
 private const val OPENAI_IMAGE_MODEL = "gpt-image-1"
 private const val OPENAI_IMAGE_GENERATION_URL = "https://api.openai.com/v1/images/generations"
 
 /**
- * OpenAI API와 상호작용하기 위한 서비스 클래스입니다.
- * com.aallam.openai.client.OpenAI 인스턴스를 초기화하고 관리합니다.
- * 이미지 생성은 Ktor HTTP 클라이언트를 사용합니다.
+ * OpenAI API와 상호작용하기 위한 서비스 클래스
+ * com.aallam.openai.client.OpenAI 인스턴스를 초기화하고 관리
+ * 이미지 생성은 Ktor HTTP 클라이언트를 사용
  */
 class OpenAIService {
     private var openAIClient: OpenAI? = null
@@ -59,9 +59,9 @@ class OpenAIService {
     }
 
     /**
-     * OpenAI 클라이언트를 초기화합니다.
+     * OpenAI 클라이언트를 초기화
      * API 키는 OPENAI_API_KEY 환경 변수를 통해 자동으로 로드됩니다.
-     * 클라이언트 초기화에 실패하면 에러를 로깅하고 client를 null로 설정합니다.
+     * 클라이언트 초기화에 실패하면 에러를 로깅하고 client를 null로 설정
      */
     private fun initializeClient() {
         try {
@@ -84,7 +84,7 @@ class OpenAIService {
     }
 
     /**
-     * 초기화된 OpenAI 인스턴스를 반환합니다.
+     * 초기화된 OpenAI 인스턴스를 반환
      * 클라이언트가 성공적으로 초기화되지 않은 경우 null을 반환할 수 있다.
      * @return OpenAI 인스턴스 또는 null
      */
@@ -96,7 +96,7 @@ class OpenAIService {
     }
 
     /**
-     * 두 캐릭터 간의 전투 내용을 생성하고 결과를 반환합니다.
+     * 두 캐릭터 간의 전투 내용을 생성하고 결과를 반환
      * @param characterA 첫 번째 캐릭터의 상세 정보
      * @param characterB 두 번째 캐릭터의 상세 정보
      * @return BattleResult(전투 내용, 승자 이름) 또는 API 호출 실패 시 null
@@ -167,7 +167,7 @@ class OpenAIService {
     data class BattleResult(val narrative: String?, val winnerName: String?, val imageUrl: String? = null)
 
     /**
-     * OpenAI API 응답 텍스트에서 전투 내용과 승자 이름을 파싱합니다.
+     * OpenAI API 응답 텍스트에서 전투 내용과 승자 이름을 파싱
      * @param responseText 파싱할 전체 응답 문자열
      * @return BattleResult 객체 또는 파싱 실패 시 null
      */
@@ -204,7 +204,7 @@ class OpenAIService {
     }
 
     /**
-     * 이미지 생성 결과를 담는 데이터 클래스입니다.
+     * 이미지 생성 결과를 담는 데이터 클래스
      * @param imageUrl 생성된 이미지의 URL (gpt-image-1에서는 data URI 형태)
      * @param errorMessage 오류 발생 시 메시지
      */
@@ -247,7 +247,7 @@ class OpenAIService {
     )
 
     /**
-     * 전투 내용을 기반으로 이미지 생성 프롬프트를 생성합니다.
+     * 전투 내용을 기반으로 이미지 생성 프롬프트를 생성
      * @param narrative 전투 내용
      * @param winnerName 승자 이름 (선택 사항)
      * @return 생성된 프롬프트 문자열
@@ -263,8 +263,8 @@ class OpenAIService {
     }
 
     /**
-     * 전투 내용을 기반으로 Ktor HTTP 클라이언트를 사용하여 이미지를 생성하고 이미지 URL을 반환합니다.
-     * gpt-image-1 모델은 base64 형태로만 이미지를 반환하므로 data URI로 변환합니다.
+     * 전투 내용을 기반으로 Ktor HTTP 클라이언트를 사용하여 이미지를 생성하고 이미지 URL을 반환
+     * gpt-image-1 모델은 base64 형태로만 이미지를 반환하므로 data URI로 변환한다.
      * @param battleNarrative 전투 내용
      * @param winnerName 승자 이름 (선택 사항)
      * @return ImageResult(생성된 이미지 data URI, 오류 메시지) 또는 API 호출 실패 시 null

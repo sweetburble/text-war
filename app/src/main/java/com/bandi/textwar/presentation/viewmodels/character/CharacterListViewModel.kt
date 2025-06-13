@@ -84,7 +84,7 @@ class CharacterListViewModel @Inject constructor(
     }
 
     /**
-     * 특정 캐릭터의 쿨다운 정보를 로드하여 _characterCooldowns 상태를 업데이트합니다.
+     * 특정 캐릭터의 쿨다운 정보를 로드하여 _characterCooldowns 상태를 업데이트
      * @param updateUiImmediately UI에 즉시 반영할지 여부 (findOpponent 시에는 true)
      */
     fun loadCharacterCooldown(characterId: String, updateUiImmediately: Boolean = true) {
@@ -162,8 +162,8 @@ class CharacterListViewModel @Inject constructor(
     }
 
     /**
-     * 검색된 상대 캐릭터 정보와 나의 캐릭터 ID를 초기화합니다.
-     * 화면 이동 후 호출하여 이전 정보가 남아있지 않도록 합니다.
+     * 검색된 상대 캐릭터 정보와 나의 캐릭터 ID를 초기화
+     * 화면 이동 후 호출하여 이전 정보가 남아있지 않도록 한다.
      */
     fun clearBattleContext() {
         _opponentCharacter.value = null
@@ -171,7 +171,7 @@ class CharacterListViewModel @Inject constructor(
     }
 
     /**
-     * 현재 표시되고 있는 오류 메시지를 초기화합니다.
+     * 현재 표시되고 있는 오류 메시지를 초기화
      */
     fun clearError() {
         _error.value = null

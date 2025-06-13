@@ -4,12 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.SnackbarHostState // 스낵바 사용을 위해 추가
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember // 스낵바 상태를 위해 추가
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -103,10 +103,10 @@ fun AppNavigation(
             }
         }
 
-        // MAIN_GRAPH를 composable로 직접 정의하고, MainAppScreen이 자체 NavHost를 갖도록 합니다.
+        // MAIN_GRAPH를 composable로 직접 정의하고, MainAppScreen이 자체 NavHost를 갖도록 한다.
         composable(route = NavigationRouteName.MAIN_GRAPH) {
-            // MainAppScreen은 자체 NavController를 사용합니다.
-            // MainActivity의 appNavController는 MainAppScreen으로의 진입/이탈만 관리합니다.
+            // MainAppScreen은 자체 NavController를 사용
+            // MainActivity의 appNavController는 MainAppScreen으로의 진입/이탈만 관리
             MainAppScreen(
                 // MainAppScreen 내부 NavController는 MainAppScreen에서 rememberNavController()로 생성
                 authViewModel = authViewModel, // AuthViewModel 전달

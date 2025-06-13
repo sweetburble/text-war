@@ -167,7 +167,7 @@ fun MainNavigationGraph(
         modifier = modifier
     ) {
         composable(BottomNavItem.CharacterList.route) {
-            CharacterListScreen(navController = navController, sharedEventViewModel = sharedEventViewModel)
+            CharacterListScreen(navController = navController)
         }
         composable(BottomNavItem.BattleHistory.route) {
             BattleHistoryScreen(navController = navController)

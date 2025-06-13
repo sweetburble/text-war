@@ -15,16 +15,14 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    // UseCases 직접 주입 제거
 ) : ViewModel() {
 
     // Settings 화면 자체의 UI 상태 (예: 로딩 스피너, 버튼 활성화 여부 등)
     private val _settingsScreenUiState = MutableStateFlow(SettingsScreenUiState())
     val settingsScreenUiState: StateFlow<SettingsScreenUiState> = _settingsScreenUiState.asStateFlow()
 
-    // AuthViewModel의 AuthUiState를 구독하여 로딩/에러 상태를 반영할 수 있습니다.
-    // 이 부분은 SettingsScreen에서 직접 AuthViewModel의 authUiState를 관찰하는 것으로 대체할 수도 있습니다.
-    // 여기서는 SettingsViewModel이 AuthViewModel의 상태 변화에 따라 자체 UI를 업데이트하는 예시를 보여줍니다.
+    // AuthViewModel의 AuthUiState를 구독하여 로딩/에러 상태를 반영할 수 있다.
+    // 이 부분은 SettingsScreen에서 직접 AuthViewModel의 authUiState를 관찰하는 것으로 대체할 수도 있다.
     fun observeAuthUiState(authUiState: AuthUiState) {
         when (authUiState) {
             is AuthUiState.Loading -> {
@@ -48,8 +46,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     // 아래 logout, withdraw 함수는 이제 실제 로직을 수행하지 않고,
-    // UI에서 이 함수들이 호출되면, 상위 Composable(MainActivity)에 정의된 콜백을 실행하도록 합니다.
-    // SettingsViewModel은 버튼 클릭 시 로딩 상태를 true로 변경하는 등의 역할만 할 수 있습니다.
+    // UI에서 이 함수들이 호출되면, 상위 Composable(MainActivity)에 정의된 콜백을 실행하도록 한다.
+    // SettingsViewModel은 버튼 클릭 시 로딩 상태를 true로 변경하는 등의 역할만 할 수 있다.
 
     /**
      * 로그아웃 요청 시 UI 상태 변경 (실제 로그아웃은 콜백으로 처리)

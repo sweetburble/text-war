@@ -42,7 +42,7 @@ fun SignUpScreen(
             is AuthUiState.Success -> {
                 snackbarHostState.showSnackbar(
                     scope = scope,
-                    message = "회원가입 성공! 로그인 해주세요." // 성공 메시지
+                    message = "이메일 인증 후, 로그인 해주세요." // 성공 메시지
                 )
                 onSignUpSuccess() // 성공 콜백 호출 (예: 로그인 화면으로 이동)
                 authViewModel.resetAuthUiState() // 성공 후 상태 초기화

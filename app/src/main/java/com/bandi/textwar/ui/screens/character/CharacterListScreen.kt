@@ -44,15 +44,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import com.bandi.textwar.domain.usecases.battle.CheckBattleCooldownUseCase
-import com.bandi.textwar.presentation.viewmodels.shared.SharedEventViewModel
 
 @Composable
 fun CharacterListScreen(
     navController: NavController,
-    sharedEventViewModel: SharedEventViewModel,
     viewModel: CharacterListViewModel = hiltViewModel() // ViewModel 주입
 ) {
-    // 화면에 진입할 때마다 캐릭터 목록을 새로 불러옵니다 (삭제/생성/수정 반영)
+    // 화면에 진입할 때마다 캐릭터 목록을 새로 불러온다 (삭제/생성/수정 반영)
     LaunchedEffect(Unit) {
         viewModel.loadCharacters()
     }

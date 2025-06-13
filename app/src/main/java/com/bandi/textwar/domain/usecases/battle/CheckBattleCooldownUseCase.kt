@@ -3,13 +3,12 @@ package com.bandi.textwar.domain.usecases.battle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
-import java.time.Duration
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import javax.inject.Inject
 
 /**
- * 캐릭터의 마지막 전투 시간과 현재 시간을 비교하여 쿨다운 여부 및 남은 시간을 반환하는 UseCase
+ * 캐릭터의 마지막 전투 시간과 현재 시간을 비교하여, 쿨다운 여부 및 남은 시간을 반환하는 UseCase
 */
 class CheckBattleCooldownUseCase @Inject constructor(
     private val getCharacterLastBattleTimestampUseCase: GetCharacterLastBattleTimestampUseCase
