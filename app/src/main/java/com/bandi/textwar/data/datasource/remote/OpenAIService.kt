@@ -10,7 +10,7 @@ import com.bandi.textwar.data.models.CharacterDetail
 import timber.log.Timber
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -42,7 +42,7 @@ class OpenAIService {
 
     init {
         initializeClient()
-        ktorHttpClient = HttpClient(CIO) {
+        ktorHttpClient = HttpClient(Android) {
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true

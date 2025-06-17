@@ -55,6 +55,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -85,6 +87,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // desugaring
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
     // Timber(로깅)
     implementation(libs.timber)
 
@@ -111,8 +116,6 @@ dependencies {
     implementation(libs.ktor.core)
     implementation(libs.ktor.utils)
 
-    // Ktor Client CIO Engine (HTTP 요청용)
-    implementation(libs.ktor.cio)
     // Ktor Content Negotiation (JSON 등 컨텐츠 협상용)
     implementation(libs.ktor.content.negotiation)
     // Ktor Kotlinx Serialization (JSON 직렬화/역직렬화용)
