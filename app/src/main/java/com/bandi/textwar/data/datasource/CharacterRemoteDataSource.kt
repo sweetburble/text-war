@@ -37,30 +37,12 @@ class CharacterRemoteDataSource @Inject constructor(
      */
     suspend fun deleteCharacter(characterId: String): Result<Unit> {
         return try {
-            val currentUserId = supabaseClient.auth.currentUserOrNull()?.id
-                ?: return Result.failure(IllegalStateException("사용자가 로그인되어 있지 않습니다."))
-
-            // 1. battle_records에서 해당 캐릭터가 참조된 모든 row를 먼저 삭제
-            // character_a_id, character_b_id, winner_id 중 하나라도 일치하는 경우 모두 삭제
-            supabaseClient.postgrest.from("battle_records")
-                .delete {
-                    filter {
-                        or {
-                            eq("character_a_id", characterId)
-                            eq("character_b_id", characterId)
-                            eq("winner_id", characterId)
-                        }
-                    }
+            supabaseClient.postgrest.rpc(
+                function = "delete_character_and_records",
+                parameters = buildJsonObject {
+                    put("character_id_to_delete", JsonPrimitive(characterId))
                 }
-
-            // 2. 캐릭터 삭제
-            supabaseClient.postgrest.from("characters")
-                .delete {
-                    filter {
-                        eq("id", characterId)
-                        eq("user_id", currentUserId)
-                    }
-                }
+            )
             Result.success(Unit)
         } catch (e: Exception) {
             Timber.e(e, "캐릭터 삭제 중 오류 발생")
