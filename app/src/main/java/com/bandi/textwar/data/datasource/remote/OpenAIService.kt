@@ -26,7 +26,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-private const val OPENAI_CHAT_MODEL = "gpt-4o-mini-2024-07-18"
+private const val OPENAI_CHAT_MODEL = "gpt-5-mini-2025-08-07"
 private const val OPENAI_IMAGE_MODEL = "gpt-image-1"
 private const val OPENAI_IMAGE_GENERATION_URL = "https://api.openai.com/v1/images/generations"
 
